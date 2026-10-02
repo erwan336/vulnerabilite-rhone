@@ -1,0 +1,1476 @@
+{
+  "departement": {
+    "id": "departement",
+    "titre": "Département du Rhône (69)",
+    "titre_court": "Département entier",
+    "zones": ["69D", "69M"],
+    "n_iris": {
+      "total": 752,
+      "classes": 731,
+      "sans_information": 21
+    },
+    "population_classee": 1894864,
+    "avertissement": "Niveaux RELATIFS au territoire : chaque IRIS est comparé aux seuls IRIS de ce territoire.",
+    "acp": {
+      "n_axes_retenus": 2,
+      "inertie_axes_retenus_pct": 85.9,
+      "valeurs_propres": [
+        {
+          "axe": 1,
+          "valeur_propre": 3.023,
+          "inertie_pct": 60.5,
+          "inertie_cumulee_pct": 60.5
+        },
+        {
+          "axe": 2,
+          "valeur_propre": 1.274,
+          "inertie_pct": 25.5,
+          "inertie_cumulee_pct": 85.9
+        },
+        {
+          "axe": 3,
+          "valeur_propre": 0.344,
+          "inertie_pct": 6.9,
+          "inertie_cumulee_pct": 92.8
+        },
+        {
+          "axe": 4,
+          "valeur_propre": 0.211,
+          "inertie_pct": 4.2,
+          "inertie_cumulee_pct": 97
+        },
+        {
+          "axe": 5,
+          "valeur_propre": 0.148,
+          "inertie_pct": 3,
+          "inertie_cumulee_pct": 100
+        }
+      ],
+      "variables": [
+        {
+          "variable": "revenu_med",
+          "contribution_axe1": 27.8,
+          "contribution_axe2": 0.1,
+          "correlation_axe1": -0.916,
+          "correlation_axe2": 0.037
+        },
+        {
+          "variable": "pct_sansdip",
+          "contribution_axe1": 26,
+          "contribution_axe2": 5.4,
+          "correlation_axe1": 0.887,
+          "correlation_axe2": -0.263
+        },
+        {
+          "variable": "pct_ouvriers",
+          "contribution_axe1": 19.4,
+          "contribution_axe2": 18.9,
+          "correlation_axe1": 0.765,
+          "correlation_axe2": -0.491
+        },
+        {
+          "variable": "pct_immigres",
+          "contribution_axe1": 22.9,
+          "contribution_axe2": 12.9,
+          "correlation_axe1": 0.832,
+          "correlation_axe2": 0.405
+        },
+        {
+          "variable": "pct_surocc",
+          "contribution_axe1": 3.9,
+          "contribution_axe2": 62.6,
+          "correlation_axe1": 0.343,
+          "correlation_axe2": 0.893
+        }
+      ]
+    },
+    "cah": {
+      "methode": "Ward (ward.D2) sur les coordonnées des axes retenus",
+      "K": 5,
+      "silhouette_moyenne": 0.327,
+      "comparaison_K": [
+        {
+          "K": 3,
+          "silhouette": 0.386,
+          "classe_min": 108,
+          "classe_max": 454
+        },
+        {
+          "K": 4,
+          "silhouette": 0.364,
+          "classe_min": 108,
+          "classe_max": 285
+        },
+        {
+          "K": 5,
+          "silhouette": 0.327,
+          "classe_min": 88,
+          "classe_max": 197
+        },
+        {
+          "K": 6,
+          "silhouette": 0.337,
+          "classe_min": 52,
+          "classe_max": 197
+        }
+      ]
+    },
+    "classes": [
+      {
+        "code": 1,
+        "niveau": "Très faible",
+        "niveau_long": "Vulnérabilité très faible",
+        "profil": "Très favorisé",
+        "couleur": "#1B5E20",
+        "couleur_texte": "#FFFFFF",
+        "nom": "Revenus élevés, population diplômée, peu d'ouvriers",
+        "nom_complet": "Très favorisé - Revenus élevés, population diplômée, peu d'ouvriers",
+        "n_iris": 88,
+        "part_iris_pct": 12,
+        "population": 225338,
+        "part_population_pct": 11.9,
+        "medianes": {
+          "revenu_med": 32045,
+          "pct_sansdip": 12.9,
+          "pct_ouvriers": 4.4,
+          "pct_immigres": 5.3,
+          "pct_surocc": 2.4
+        },
+        "moyennes": {
+          "revenu_med": 32628,
+          "pct_sansdip": 12.5,
+          "pct_ouvriers": 4.3,
+          "pct_immigres": 5.2,
+          "pct_surocc": 3.6
+        },
+        "z_scores": {
+          "revenu_med": 1.52,
+          "pct_sansdip": -0.91,
+          "pct_ouvriers": -0.99,
+          "pct_immigres": -0.74,
+          "pct_surocc": -0.69
+        },
+        "stabilite": {
+          "jaccard": 0.543,
+          "silhouette": 0.488,
+          "qualification": "Fragile"
+        },
+        "v_tests": [],
+        "communes_principales": [
+          {
+            "commune": "Lyon 6e Arrondissement",
+            "n_iris": 7
+          },
+          {
+            "commune": "Caluire-et-Cuire",
+            "n_iris": 5
+          },
+          {
+            "commune": "Écully",
+            "n_iris": 4
+          },
+          {
+            "commune": "Genas",
+            "n_iris": 3
+          },
+          {
+            "commune": "Sainte-Foy-lès-Lyon",
+            "n_iris": 3
+          }
+        ]
+      },
+      {
+        "code": 2,
+        "niveau": "Faible",
+        "niveau_long": "Vulnérabilité faible",
+        "profil": "Favorisé",
+        "couleur": "#66BB6A",
+        "couleur_texte": "#212121",
+        "nom": "Classes moyennes, faible présence immigrée",
+        "nom_complet": "Favorisé - Classes moyennes, faible présence immigrée",
+        "n_iris": 197,
+        "part_iris_pct": 26.9,
+        "population": 493497,
+        "part_population_pct": 26,
+        "medianes": {
+          "revenu_med": 26490,
+          "pct_sansdip": 18.9,
+          "pct_ouvriers": 8.6,
+          "pct_immigres": 6.9,
+          "pct_surocc": 3.9
+        },
+        "moyennes": {
+          "revenu_med": 26376,
+          "pct_sansdip": 19,
+          "pct_ouvriers": 8.7,
+          "pct_immigres": 7,
+          "pct_surocc": 4.3
+        },
+        "z_scores": {
+          "revenu_med": 0.3,
+          "pct_sansdip": -0.29,
+          "pct_ouvriers": -0.22,
+          "pct_immigres": -0.56,
+          "pct_surocc": -0.63
+        },
+        "stabilite": {
+          "jaccard": 0.506,
+          "silhouette": 0.388,
+          "qualification": "Fragile"
+        },
+        "v_tests": [],
+        "communes_principales": [
+          {
+            "commune": "Caluire-et-Cuire",
+            "n_iris": 8
+          },
+          {
+            "commune": "Oullins-Pierre-Bénite",
+            "n_iris": 8
+          },
+          {
+            "commune": "Lyon 5e Arrondissement",
+            "n_iris": 7
+          },
+          {
+            "commune": "Meyzieu",
+            "n_iris": 7
+          },
+          {
+            "commune": "Mions",
+            "n_iris": 4
+          }
+        ]
+      },
+      {
+        "code": 3,
+        "niveau": "Modérée",
+        "niveau_long": "Vulnérabilité modérée",
+        "profil": "Intermédiaire",
+        "couleur": "#FFD54F",
+        "couleur_texte": "#212121",
+        "nom": "Centre urbain dense : petits logements suroccupés, population diplômée",
+        "nom_complet": "Intermédiaire - Centre urbain dense : petits logements suroccupés, population diplômée",
+        "n_iris": 169,
+        "part_iris_pct": 23.1,
+        "population": 550267,
+        "part_population_pct": 29,
+        "medianes": {
+          "revenu_med": 26110,
+          "pct_sansdip": 14.1,
+          "pct_ouvriers": 5.2,
+          "pct_immigres": 13.3,
+          "pct_surocc": 21.1
+        },
+        "moyennes": {
+          "revenu_med": 26111,
+          "pct_sansdip": 14.5,
+          "pct_ouvriers": 5.4,
+          "pct_immigres": 13.7,
+          "pct_surocc": 22.8
+        },
+        "z_scores": {
+          "revenu_med": 0.25,
+          "pct_sansdip": -0.72,
+          "pct_ouvriers": -0.8,
+          "pct_immigres": 0.13,
+          "pct_surocc": 1.17
+        },
+        "stabilite": {
+          "jaccard": 0.697,
+          "silhouette": 0.235,
+          "qualification": "Modérée"
+        },
+        "v_tests": [],
+        "communes_principales": [
+          {
+            "commune": "Lyon 3e Arrondissement",
+            "n_iris": 28
+          },
+          {
+            "commune": "Villeurbanne",
+            "n_iris": 27
+          },
+          {
+            "commune": "Lyon 7e Arrondissement",
+            "n_iris": 21
+          },
+          {
+            "commune": "Lyon 8e Arrondissement",
+            "n_iris": 14
+          },
+          {
+            "commune": "Lyon 6e Arrondissement",
+            "n_iris": 12
+          }
+        ]
+      },
+      {
+        "code": 4,
+        "niveau": "Élevée",
+        "niveau_long": "Vulnérabilité élevée",
+        "profil": "Défavorisé",
+        "couleur": "#FF8A65",
+        "couleur_texte": "#212121",
+        "nom": "Profil ouvrier, peu diplômé, faible présence immigrée",
+        "nom_complet": "Défavorisé - Profil ouvrier, peu diplômé, faible présence immigrée",
+        "n_iris": 169,
+        "part_iris_pct": 23.1,
+        "population": 343478,
+        "part_population_pct": 18.1,
+        "medianes": {
+          "revenu_med": 22900,
+          "pct_sansdip": 26.3,
+          "pct_ouvriers": 14.2,
+          "pct_immigres": 7.7,
+          "pct_surocc": 4
+        },
+        "moyennes": {
+          "revenu_med": 22725,
+          "pct_sansdip": 26.9,
+          "pct_ouvriers": 14.2,
+          "pct_immigres": 9.8,
+          "pct_surocc": 5.6
+        },
+        "z_scores": {
+          "revenu_med": -0.41,
+          "pct_sansdip": 0.45,
+          "pct_ouvriers": 0.76,
+          "pct_immigres": -0.27,
+          "pct_surocc": -0.5
+        },
+        "stabilite": {
+          "jaccard": 0.46,
+          "silhouette": 0.169,
+          "qualification": "Fragile"
+        },
+        "v_tests": [],
+        "communes_principales": [
+          {
+            "commune": "Décines-Charpieu",
+            "n_iris": 8
+          },
+          {
+            "commune": "Villeurbanne",
+            "n_iris": 8
+          },
+          {
+            "commune": "Saint-Priest",
+            "n_iris": 6
+          },
+          {
+            "commune": "Meyzieu",
+            "n_iris": 5
+          },
+          {
+            "commune": "Villefranche-sur-Saône",
+            "n_iris": 5
+          }
+        ]
+      },
+      {
+        "code": 5,
+        "niveau": "Très élevée",
+        "niveau_long": "Vulnérabilité très élevée",
+        "profil": "Très défavorisé",
+        "couleur": "#D32F2F",
+        "couleur_texte": "#FFFFFF",
+        "nom": "Revenus faibles, forte présence immigrée et suroccupation",
+        "nom_complet": "Très défavorisé - Revenus faibles, forte présence immigrée et suroccupation",
+        "n_iris": 108,
+        "part_iris_pct": 14.8,
+        "population": 282284,
+        "part_population_pct": 14.9,
+        "medianes": {
+          "revenu_med": 16855,
+          "pct_sansdip": 39.8,
+          "pct_ouvriers": 17,
+          "pct_immigres": 29.8,
+          "pct_surocc": 15.8
+        },
+        "moyennes": {
+          "revenu_med": 16807,
+          "pct_sansdip": 40.1,
+          "pct_ouvriers": 17.2,
+          "pct_immigres": 30.4,
+          "pct_surocc": 17.5
+        },
+        "z_scores": {
+          "revenu_med": -1.56,
+          "pct_sansdip": 1.69,
+          "pct_ouvriers": 1.29,
+          "pct_immigres": 1.84,
+          "pct_surocc": 0.66
+        },
+        "stabilite": {
+          "jaccard": 0.83,
+          "silhouette": 0.478,
+          "qualification": "Stable"
+        },
+        "v_tests": [],
+        "communes_principales": [
+          {
+            "commune": "Vénissieux",
+            "n_iris": 19
+          },
+          {
+            "commune": "Vaulx-en-Velin",
+            "n_iris": 17
+          },
+          {
+            "commune": "Lyon 8e Arrondissement",
+            "n_iris": 10
+          },
+          {
+            "commune": "Saint-Priest",
+            "n_iris": 9
+          },
+          {
+            "commune": "Villeurbanne",
+            "n_iris": 9
+          }
+        ]
+      }
+    ],
+    "ensemble": {
+      "n_iris": 731,
+      "population": 1894864,
+      "medianes": {
+        "revenu_med": 24720,
+        "pct_sansdip": 19.7,
+        "pct_ouvriers": 8.9,
+        "pct_immigres": 9.8,
+        "pct_surocc": 7.5
+      },
+      "moyennes": {
+        "revenu_med": 24810,
+        "pct_sansdip": 22.1,
+        "pct_ouvriers": 9.9,
+        "pct_immigres": 12.4,
+        "pct_surocc": 10.7
+      },
+      "ecarts_types": {
+        "revenu_med": 5139,
+        "pct_sansdip": 10.6,
+        "pct_ouvriers": 5.7,
+        "pct_immigres": 9.7,
+        "pct_surocc": 10.3
+      }
+    },
+    "croisement_departement": null
+  },
+  "metropole": {
+    "id": "metropole",
+    "titre": "Métropole de Lyon",
+    "titre_court": "Métropole",
+    "zones": ["69M"],
+    "n_iris": {
+      "total": 512,
+      "classes": 493,
+      "sans_information": 19
+    },
+    "population_classee": 1424691,
+    "avertissement": "Niveaux RELATIFS au territoire : chaque IRIS est comparé aux seuls IRIS de ce territoire.",
+    "acp": {
+      "n_axes_retenus": 2,
+      "inertie_axes_retenus_pct": 89,
+      "valeurs_propres": [
+        {
+          "axe": 1,
+          "valeur_propre": 3.38,
+          "inertie_pct": 67.6,
+          "inertie_cumulee_pct": 67.6
+        },
+        {
+          "axe": 2,
+          "valeur_propre": 1.071,
+          "inertie_pct": 21.4,
+          "inertie_cumulee_pct": 89
+        },
+        {
+          "axe": 3,
+          "valeur_propre": 0.214,
+          "inertie_pct": 4.3,
+          "inertie_cumulee_pct": 93.3
+        },
+        {
+          "axe": 4,
+          "valeur_propre": 0.194,
+          "inertie_pct": 3.9,
+          "inertie_cumulee_pct": 97.2
+        },
+        {
+          "axe": 5,
+          "valeur_propre": 0.142,
+          "inertie_pct": 2.8,
+          "inertie_cumulee_pct": 100
+        }
+      ],
+      "variables": [
+        {
+          "variable": "revenu_med",
+          "contribution_axe1": 25,
+          "contribution_axe2": 0.4,
+          "correlation_axe1": -0.919,
+          "correlation_axe2": -0.069
+        },
+        {
+          "variable": "pct_sansdip",
+          "contribution_axe1": 23.8,
+          "contribution_axe2": 8.1,
+          "correlation_axe1": 0.897,
+          "correlation_axe2": -0.295
+        },
+        {
+          "variable": "pct_ouvriers",
+          "contribution_axe1": 23.5,
+          "contribution_axe2": 5.3,
+          "correlation_axe1": 0.89,
+          "correlation_axe2": -0.239
+        },
+        {
+          "variable": "pct_immigres",
+          "contribution_axe1": 25.4,
+          "contribution_axe2": 2.3,
+          "correlation_axe1": 0.926,
+          "correlation_axe2": 0.158
+        },
+        {
+          "variable": "pct_surocc",
+          "contribution_axe1": 2.4,
+          "contribution_axe2": 83.7,
+          "correlation_axe1": 0.283,
+          "correlation_axe2": 0.947
+        }
+      ]
+    },
+    "cah": {
+      "methode": "Ward (ward.D2) sur les coordonnées des axes retenus",
+      "K": 5,
+      "silhouette_moyenne": 0.368,
+      "comparaison_K": [
+        {
+          "K": 3,
+          "silhouette": 0.322,
+          "classe_min": 97,
+          "classe_max": 202
+        },
+        {
+          "K": 4,
+          "silhouette": 0.355,
+          "classe_min": 51,
+          "classe_max": 202
+        },
+        {
+          "K": 5,
+          "silhouette": 0.368,
+          "classe_min": 51,
+          "classe_max": 143
+        },
+        {
+          "K": 6,
+          "silhouette": 0.345,
+          "classe_min": 25,
+          "classe_max": 143
+        }
+      ]
+    },
+    "classes": [
+      {
+        "code": 1,
+        "niveau": "Très faible",
+        "niveau_long": "Vulnérabilité très faible",
+        "profil": "Très favorisé",
+        "couleur": "#1B5E20",
+        "couleur_texte": "#FFFFFF",
+        "nom": "Revenus élevés, population diplômée, peu d'ouvriers (suroccupation plus faible que 'Favorisé')",
+        "nom_complet": "Très favorisé - Revenus élevés, population diplômée, peu d'ouvriers (suroccupation plus faible que 'Favorisé')",
+        "n_iris": 102,
+        "part_iris_pct": 20.7,
+        "population": 264582,
+        "part_population_pct": 18.6,
+        "medianes": {
+          "revenu_med": 30500,
+          "pct_sansdip": 14.1,
+          "pct_ouvriers": 4.4,
+          "pct_immigres": 7.1,
+          "pct_surocc": 5
+        },
+        "moyennes": {
+          "revenu_med": 31531,
+          "pct_sansdip": 14.1,
+          "pct_ouvriers": 4.4,
+          "pct_immigres": 7.1,
+          "pct_surocc": 5.4
+        },
+        "z_scores": {
+          "revenu_med": 1.2,
+          "pct_sansdip": -0.71,
+          "pct_ouvriers": -0.79,
+          "pct_immigres": -0.95,
+          "pct_surocc": -0.87
+        },
+        "stabilite": {
+          "jaccard": 0.667,
+          "silhouette": 0.448,
+          "qualification": "Modérée"
+        },
+        "v_tests": [],
+        "communes_principales": [
+          {
+            "commune": "Caluire-et-Cuire",
+            "n_iris": 12
+          },
+          {
+            "commune": "Lyon 6e Arrondissement",
+            "n_iris": 7
+          },
+          {
+            "commune": "Sainte-Foy-lès-Lyon",
+            "n_iris": 7
+          },
+          {
+            "commune": "Écully",
+            "n_iris": 6
+          },
+          {
+            "commune": "Lyon 5e Arrondissement",
+            "n_iris": 5
+          }
+        ]
+      },
+      {
+        "code": 2,
+        "niveau": "Faible",
+        "niveau_long": "Vulnérabilité faible",
+        "profil": "Favorisé",
+        "couleur": "#66BB6A",
+        "couleur_texte": "#212121",
+        "nom": "Revenus élevés, population diplômée, peu d'ouvriers (suroccupation plus forte que 'Très favorisé')",
+        "nom_complet": "Favorisé - Revenus élevés, population diplômée, peu d'ouvriers (suroccupation plus forte que 'Très favorisé')",
+        "n_iris": 100,
+        "part_iris_pct": 20.3,
+        "population": 302845,
+        "part_population_pct": 21.3,
+        "medianes": {
+          "revenu_med": 27385,
+          "pct_sansdip": 11.7,
+          "pct_ouvriers": 4.1,
+          "pct_immigres": 10.7,
+          "pct_surocc": 18.9
+        },
+        "moyennes": {
+          "revenu_med": 27639,
+          "pct_sansdip": 12.9,
+          "pct_ouvriers": 4.4,
+          "pct_immigres": 11.1,
+          "pct_surocc": 19.7
+        },
+        "z_scores": {
+          "revenu_med": 0.53,
+          "pct_sansdip": -0.81,
+          "pct_ouvriers": -0.79,
+          "pct_immigres": -0.52,
+          "pct_surocc": 0.49
+        },
+        "stabilite": {
+          "jaccard": 0.609,
+          "silhouette": 0.355,
+          "qualification": "Modérée"
+        },
+        "v_tests": [],
+        "communes_principales": [
+          {
+            "commune": "Lyon 3e Arrondissement",
+            "n_iris": 20
+          },
+          {
+            "commune": "Lyon 6e Arrondissement",
+            "n_iris": 11
+          },
+          {
+            "commune": "Lyon 7e Arrondissement",
+            "n_iris": 11
+          },
+          {
+            "commune": "Lyon 4e Arrondissement",
+            "n_iris": 9
+          },
+          {
+            "commune": "Lyon 8e Arrondissement",
+            "n_iris": 9
+          }
+        ]
+      },
+      {
+        "code": 3,
+        "niveau": "Modérée",
+        "niveau_long": "Vulnérabilité modérée",
+        "profil": "Intermédiaire",
+        "couleur": "#FFD54F",
+        "couleur_texte": "#212121",
+        "nom": "Profil moyen",
+        "nom_complet": "Intermédiaire - Profil moyen",
+        "n_iris": 143,
+        "part_iris_pct": 29,
+        "population": 429315,
+        "part_population_pct": 30.1,
+        "medianes": {
+          "revenu_med": 23630,
+          "pct_sansdip": 23.1,
+          "pct_ouvriers": 9.5,
+          "pct_immigres": 14.2,
+          "pct_surocc": 8.1
+        },
+        "moyennes": {
+          "revenu_med": 23387,
+          "pct_sansdip": 23.9,
+          "pct_ouvriers": 9.8,
+          "pct_immigres": 14.7,
+          "pct_surocc": 9.8
+        },
+        "z_scores": {
+          "revenu_med": -0.21,
+          "pct_sansdip": 0.12,
+          "pct_ouvriers": 0.15,
+          "pct_immigres": -0.14,
+          "pct_surocc": -0.46
+        },
+        "stabilite": {
+          "jaccard": 0.58,
+          "silhouette": 0.336,
+          "qualification": "Fragile"
+        },
+        "v_tests": [],
+        "communes_principales": [
+          {
+            "commune": "Villeurbanne",
+            "n_iris": 20
+          },
+          {
+            "commune": "Saint-Priest",
+            "n_iris": 11
+          },
+          {
+            "commune": "Décines-Charpieu",
+            "n_iris": 10
+          },
+          {
+            "commune": "Oullins-Pierre-Bénite",
+            "n_iris": 10
+          },
+          {
+            "commune": "Meyzieu",
+            "n_iris": 9
+          }
+        ]
+      },
+      {
+        "code": 4,
+        "niveau": "Élevée",
+        "niveau_long": "Vulnérabilité élevée",
+        "profil": "Défavorisé",
+        "couleur": "#FF8A65",
+        "couleur_texte": "#212121",
+        "nom": "Centre urbain dense : petits logements suroccupés, population diplômée",
+        "nom_complet": "Défavorisé - Centre urbain dense : petits logements suroccupés, population diplômée",
+        "n_iris": 51,
+        "part_iris_pct": 10.3,
+        "population": 180880,
+        "part_population_pct": 12.7,
+        "medianes": {
+          "revenu_med": 23190,
+          "pct_sansdip": 17.1,
+          "pct_ouvriers": 7.2,
+          "pct_immigres": 18.1,
+          "pct_surocc": 30.9
+        },
+        "moyennes": {
+          "revenu_med": 22368,
+          "pct_sansdip": 18.6,
+          "pct_ouvriers": 8,
+          "pct_immigres": 20.1,
+          "pct_surocc": 33.8
+        },
+        "z_scores": {
+          "revenu_med": -0.38,
+          "pct_sansdip": -0.33,
+          "pct_ouvriers": -0.17,
+          "pct_immigres": 0.44,
+          "pct_surocc": 1.84
+        },
+        "stabilite": {
+          "jaccard": 0.436,
+          "silhouette": 0.08,
+          "qualification": "Fragile"
+        },
+        "v_tests": [],
+        "communes_principales": [
+          {
+            "commune": "Villeurbanne",
+            "n_iris": 14
+          },
+          {
+            "commune": "Lyon 7e Arrondissement",
+            "n_iris": 10
+          },
+          {
+            "commune": "Lyon 3e Arrondissement",
+            "n_iris": 6
+          },
+          {
+            "commune": "Lyon 1er Arrondissement",
+            "n_iris": 4
+          },
+          {
+            "commune": "Lyon 9e Arrondissement",
+            "n_iris": 4
+          }
+        ]
+      },
+      {
+        "code": 5,
+        "niveau": "Très élevée",
+        "niveau_long": "Vulnérabilité très élevée",
+        "profil": "Très défavorisé",
+        "couleur": "#D32F2F",
+        "couleur_texte": "#FFFFFF",
+        "nom": "Revenus faibles, peu diplômé",
+        "nom_complet": "Très défavorisé - Revenus faibles, peu diplômé",
+        "n_iris": 97,
+        "part_iris_pct": 19.7,
+        "population": 247069,
+        "part_population_pct": 17.3,
+        "medianes": {
+          "revenu_med": 16880,
+          "pct_sansdip": 40.2,
+          "pct_ouvriers": 17.4,
+          "pct_immigres": 29.7,
+          "pct_surocc": 15.4
+        },
+        "moyennes": {
+          "revenu_med": 17038,
+          "pct_sansdip": 41.1,
+          "pct_ouvriers": 17.7,
+          "pct_immigres": 30.2,
+          "pct_surocc": 15.8
+        },
+        "z_scores": {
+          "revenu_med": -1.31,
+          "pct_sansdip": 1.58,
+          "pct_ouvriers": 1.51,
+          "pct_immigres": 1.52,
+          "pct_surocc": 0.11
+        },
+        "stabilite": {
+          "jaccard": 0.839,
+          "silhouette": 0.495,
+          "qualification": "Stable"
+        },
+        "v_tests": [],
+        "communes_principales": [
+          {
+            "commune": "Vénissieux",
+            "n_iris": 17
+          },
+          {
+            "commune": "Vaulx-en-Velin",
+            "n_iris": 15
+          },
+          {
+            "commune": "Lyon 8e Arrondissement",
+            "n_iris": 9
+          },
+          {
+            "commune": "Rillieux-la-Pape",
+            "n_iris": 8
+          },
+          {
+            "commune": "Saint-Priest",
+            "n_iris": 8
+          }
+        ]
+      }
+    ],
+    "ensemble": {
+      "n_iris": 493,
+      "population": 1424691,
+      "medianes": {
+        "revenu_med": 24500,
+        "pct_sansdip": 19.4,
+        "pct_ouvriers": 7.6,
+        "pct_immigres": 13.8,
+        "pct_surocc": 13
+      },
+      "moyennes": {
+        "revenu_med": 24580,
+        "pct_sansdip": 22.5,
+        "pct_ouvriers": 8.9,
+        "pct_immigres": 16,
+        "pct_surocc": 14.6
+      },
+      "ecarts_types": {
+        "revenu_med": 5779,
+        "pct_sansdip": 11.8,
+        "pct_ouvriers": 5.8,
+        "pct_immigres": 9.4,
+        "pct_surocc": 10.5
+      }
+    },
+    "croisement_departement": {
+      "description": "Nombre d'IRIS selon leur niveau dans le département entier (lignes) et dans la classification Métropole de Lyon (colonnes)",
+      "meme_niveau_pct": 33.9,
+      "cellules": [
+        {
+          "niveau_departement": 1,
+          "niveau_territoire": 1,
+          "n_iris": 58
+        },
+        {
+          "niveau_departement": 2,
+          "niveau_territoire": 1,
+          "n_iris": 36
+        },
+        {
+          "niveau_departement": 2,
+          "niveau_territoire": 3,
+          "n_iris": 61
+        },
+        {
+          "niveau_departement": 3,
+          "niveau_territoire": 1,
+          "n_iris": 8
+        },
+        {
+          "niveau_departement": 3,
+          "niveau_territoire": 2,
+          "n_iris": 100
+        },
+        {
+          "niveau_departement": 3,
+          "niveau_territoire": 3,
+          "n_iris": 17
+        },
+        {
+          "niveau_departement": 3,
+          "niveau_territoire": 4,
+          "n_iris": 44
+        },
+        {
+          "niveau_departement": 4,
+          "niveau_territoire": 3,
+          "n_iris": 61
+        },
+        {
+          "niveau_departement": 4,
+          "niveau_territoire": 5,
+          "n_iris": 5
+        },
+        {
+          "niveau_departement": 5,
+          "niveau_territoire": 3,
+          "n_iris": 4
+        },
+        {
+          "niveau_departement": 5,
+          "niveau_territoire": 4,
+          "n_iris": 7
+        },
+        {
+          "niveau_departement": 5,
+          "niveau_territoire": 5,
+          "n_iris": 92
+        }
+      ]
+    }
+  },
+  "hors_metropole": {
+    "id": "hors_metropole",
+    "titre": "Rhône hors Métropole",
+    "titre_court": "Hors Métropole",
+    "zones": ["69D"],
+    "n_iris": {
+      "total": 240,
+      "classes": 238,
+      "sans_information": 2
+    },
+    "population_classee": 470173,
+    "avertissement": "Niveaux RELATIFS au territoire : chaque IRIS est comparé aux seuls IRIS de ce territoire.",
+    "acp": {
+      "n_axes_retenus": 2,
+      "inertie_axes_retenus_pct": 78.4,
+      "valeurs_propres": [
+        {
+          "axe": 1,
+          "valeur_propre": 2.831,
+          "inertie_pct": 56.6,
+          "inertie_cumulee_pct": 56.6
+        },
+        {
+          "axe": 2,
+          "valeur_propre": 1.088,
+          "inertie_pct": 21.8,
+          "inertie_cumulee_pct": 78.4
+        },
+        {
+          "axe": 3,
+          "valeur_propre": 0.533,
+          "inertie_pct": 10.7,
+          "inertie_cumulee_pct": 89
+        },
+        {
+          "axe": 4,
+          "valeur_propre": 0.304,
+          "inertie_pct": 6.1,
+          "inertie_cumulee_pct": 95.1
+        },
+        {
+          "axe": 5,
+          "valeur_propre": 0.245,
+          "inertie_pct": 4.9,
+          "inertie_cumulee_pct": 100
+        }
+      ],
+      "variables": [
+        {
+          "variable": "revenu_med",
+          "contribution_axe1": 26.1,
+          "contribution_axe2": 8.8,
+          "correlation_axe1": -0.86,
+          "correlation_axe2": 0.309
+        },
+        {
+          "variable": "pct_sansdip",
+          "contribution_axe1": 27.2,
+          "contribution_axe2": 0.3,
+          "correlation_axe1": 0.878,
+          "correlation_axe2": -0.053
+        },
+        {
+          "variable": "pct_ouvriers",
+          "contribution_axe1": 16.4,
+          "contribution_axe2": 33.2,
+          "correlation_axe1": 0.68,
+          "correlation_axe2": -0.601
+        },
+        {
+          "variable": "pct_immigres",
+          "contribution_axe1": 18.1,
+          "contribution_axe2": 23.6,
+          "correlation_axe1": 0.715,
+          "correlation_axe2": 0.506
+        },
+        {
+          "variable": "pct_surocc",
+          "contribution_axe1": 12.3,
+          "contribution_axe2": 34.2,
+          "correlation_axe1": 0.589,
+          "correlation_axe2": 0.61
+        }
+      ]
+    },
+    "cah": {
+      "methode": "Ward (ward.D2) sur les coordonnées des axes retenus",
+      "K": 5,
+      "silhouette_moyenne": 0.356,
+      "comparaison_K": [
+        {
+          "K": 3,
+          "silhouette": 0.413,
+          "classe_min": 21,
+          "classe_max": 145
+        },
+        {
+          "K": 4,
+          "silhouette": 0.346,
+          "classe_min": 21,
+          "classe_max": 99
+        },
+        {
+          "K": 5,
+          "silhouette": 0.356,
+          "classe_min": 4,
+          "classe_max": 99
+        },
+        {
+          "K": 6,
+          "silhouette": 0.373,
+          "classe_min": 4,
+          "classe_max": 72
+        }
+      ]
+    },
+    "classes": [
+      {
+        "code": 1,
+        "niveau": "Très faible",
+        "niveau_long": "Vulnérabilité très faible",
+        "profil": "Très favorisé",
+        "couleur": "#1B5E20",
+        "couleur_texte": "#FFFFFF",
+        "nom": "Revenus élevés, population diplômée, peu d'ouvriers",
+        "nom_complet": "Très favorisé - Revenus élevés, population diplômée, peu d'ouvriers",
+        "n_iris": 72,
+        "part_iris_pct": 30.3,
+        "population": 173345,
+        "part_population_pct": 36.9,
+        "medianes": {
+          "revenu_med": 28875,
+          "pct_sansdip": 15.4,
+          "pct_ouvriers": 7.1,
+          "pct_immigres": 3.7,
+          "pct_surocc": 1.9
+        },
+        "moyennes": {
+          "revenu_med": 28909,
+          "pct_sansdip": 15.6,
+          "pct_ouvriers": 7.1,
+          "pct_immigres": 3.7,
+          "pct_surocc": 2
+        },
+        "z_scores": {
+          "revenu_med": 1.06,
+          "pct_sansdip": -0.79,
+          "pct_ouvriers": -1.03,
+          "pct_immigres": -0.24,
+          "pct_surocc": -0.29
+        },
+        "stabilite": {
+          "jaccard": 0.77,
+          "silhouette": 0.485,
+          "qualification": "Stable"
+        },
+        "v_tests": [],
+        "communes_principales": [
+          {
+            "commune": "Genas",
+            "n_iris": 4
+          },
+          {
+            "commune": "Chaponost",
+            "n_iris": 2
+          },
+          {
+            "commune": "Bagnols",
+            "n_iris": 1
+          },
+          {
+            "commune": "Beauvallon",
+            "n_iris": 1
+          },
+          {
+            "commune": "Belmont-d'Azergues",
+            "n_iris": 1
+          }
+        ]
+      },
+      {
+        "code": 2,
+        "niveau": "Faible",
+        "niveau_long": "Vulnérabilité faible",
+        "profil": "Favorisé",
+        "couleur": "#66BB6A",
+        "couleur_texte": "#212121",
+        "nom": "Profil moyen",
+        "nom_complet": "Favorisé - Profil moyen",
+        "n_iris": 99,
+        "part_iris_pct": 41.6,
+        "population": 177165,
+        "part_population_pct": 37.7,
+        "medianes": {
+          "revenu_med": 24870,
+          "pct_sansdip": 20.2,
+          "pct_ouvriers": 12.3,
+          "pct_immigres": 2.8,
+          "pct_surocc": 2.3
+        },
+        "moyennes": {
+          "revenu_med": 25036,
+          "pct_sansdip": 20.4,
+          "pct_ouvriers": 12.4,
+          "pct_immigres": 3.9,
+          "pct_surocc": 2.7
+        },
+        "z_scores": {
+          "revenu_med": -0.07,
+          "pct_sansdip": -0.14,
+          "pct_ouvriers": 0.07,
+          "pct_immigres": -0.21,
+          "pct_surocc": -0.02
+        },
+        "stabilite": {
+          "jaccard": 0.568,
+          "silhouette": 0.219,
+          "qualification": "Fragile"
+        },
+        "v_tests": [],
+        "communes_principales": [
+          {
+            "commune": "Brignais",
+            "n_iris": 3
+          },
+          {
+            "commune": "Saint-Symphorien-d'Ozon",
+            "n_iris": 2
+          },
+          {
+            "commune": "Villefranche-sur-Saône",
+            "n_iris": 2
+          },
+          {
+            "commune": "Affoux",
+            "n_iris": 1
+          },
+          {
+            "commune": "Alix",
+            "n_iris": 1
+          }
+        ]
+      },
+      {
+        "code": 3,
+        "niveau": "Modérée",
+        "niveau_long": "Vulnérabilité modérée",
+        "profil": "Intermédiaire",
+        "couleur": "#FFD54F",
+        "couleur_texte": "#212121",
+        "nom": "Profil ouvrier, peu diplômé, faible présence immigrée",
+        "nom_complet": "Intermédiaire - Profil ouvrier, peu diplômé, faible présence immigrée",
+        "n_iris": 46,
+        "part_iris_pct": 19.3,
+        "population": 67159,
+        "part_population_pct": 14.3,
+        "medianes": {
+          "revenu_med": 22590,
+          "pct_sansdip": 25.9,
+          "pct_ouvriers": 17.2,
+          "pct_immigres": 3.2,
+          "pct_surocc": 1.5
+        },
+        "moyennes": {
+          "revenu_med": 22627,
+          "pct_sansdip": 26.4,
+          "pct_ouvriers": 17.6,
+          "pct_immigres": 3.8,
+          "pct_surocc": 1.7
+        },
+        "z_scores": {
+          "revenu_med": -0.78,
+          "pct_sansdip": 0.66,
+          "pct_ouvriers": 1.16,
+          "pct_immigres": -0.23,
+          "pct_surocc": -0.4
+        },
+        "stabilite": {
+          "jaccard": 0.615,
+          "silhouette": 0.366,
+          "qualification": "Modérée"
+        },
+        "v_tests": [],
+        "communes_principales": [
+          {
+            "commune": "Amplepuis",
+            "n_iris": 2
+          },
+          {
+            "commune": "Belleville-en-Beaujolais",
+            "n_iris": 2
+          },
+          {
+            "commune": "Aveize",
+            "n_iris": 1
+          },
+          {
+            "commune": "Beaujeu",
+            "n_iris": 1
+          },
+          {
+            "commune": "Cercié",
+            "n_iris": 1
+          }
+        ]
+      },
+      {
+        "code": 4,
+        "niveau": "Élevée",
+        "niveau_long": "Vulnérabilité élevée",
+        "profil": "Défavorisé",
+        "couleur": "#FF8A65",
+        "couleur_texte": "#212121",
+        "nom": "Revenus faibles, forte présence immigrée et suroccupation (présence immigrée plus faible que 'Très défavorisé')",
+        "nom_complet": "Défavorisé - Revenus faibles, forte présence immigrée et suroccupation (présence immigrée plus faible que 'Très défavorisé')",
+        "n_iris": 17,
+        "part_iris_pct": 7.1,
+        "population": 43749,
+        "part_population_pct": 9.3,
+        "medianes": {
+          "revenu_med": 20760,
+          "pct_sansdip": 33.4,
+          "pct_ouvriers": 14.4,
+          "pct_immigres": 13.8,
+          "pct_surocc": 7.5
+        },
+        "moyennes": {
+          "revenu_med": 21069,
+          "pct_sansdip": 33.1,
+          "pct_ouvriers": 13.9,
+          "pct_immigres": 13.8,
+          "pct_surocc": 7.6
+        },
+        "z_scores": {
+          "revenu_med": -1.23,
+          "pct_sansdip": 1.56,
+          "pct_ouvriers": 0.39,
+          "pct_immigres": 1.65,
+          "pct_surocc": 1.79
+        },
+        "stabilite": {
+          "jaccard": 0.797,
+          "silhouette": 0.585,
+          "qualification": "Stable"
+        },
+        "v_tests": [],
+        "communes_principales": [
+          {
+            "commune": "Villefranche-sur-Saône",
+            "n_iris": 6
+          },
+          {
+            "commune": "Tarare",
+            "n_iris": 3
+          },
+          {
+            "commune": "Gleizé",
+            "n_iris": 2
+          },
+          {
+            "commune": "Aigueperse",
+            "n_iris": 1
+          },
+          {
+            "commune": "Belleville-en-Beaujolais",
+            "n_iris": 1
+          }
+        ]
+      },
+      {
+        "code": 5,
+        "niveau": "Très élevée",
+        "niveau_long": "Vulnérabilité très élevée",
+        "profil": "Très défavorisé",
+        "couleur": "#D32F2F",
+        "couleur_texte": "#FFFFFF",
+        "nom": "Revenus faibles, forte présence immigrée et suroccupation (présence immigrée plus forte que 'Défavorisé')",
+        "nom_complet": "Très défavorisé - Revenus faibles, forte présence immigrée et suroccupation (présence immigrée plus forte que 'Défavorisé')",
+        "n_iris": 4,
+        "part_iris_pct": 1.7,
+        "population": 8756,
+        "part_population_pct": 1.9,
+        "medianes": {
+          "revenu_med": 14175,
+          "pct_sansdip": 44.1,
+          "pct_ouvriers": 21.1,
+          "pct_immigres": 32.4,
+          "pct_surocc": 10.5
+        },
+        "moyennes": {
+          "revenu_med": 14785,
+          "pct_sansdip": 46.9,
+          "pct_ouvriers": 21.3,
+          "pct_immigres": 32.6,
+          "pct_surocc": 10.6
+        },
+        "z_scores": {
+          "revenu_med": -3.07,
+          "pct_sansdip": 3.42,
+          "pct_ouvriers": 1.93,
+          "pct_immigres": 5.19,
+          "pct_surocc": 2.9
+        },
+        "stabilite": {
+          "jaccard": 0.703,
+          "silhouette": 0.361,
+          "qualification": "Modérée"
+        },
+        "v_tests": [],
+        "communes_principales": [
+          {
+            "commune": "Villefranche-sur-Saône",
+            "n_iris": 4
+          }
+        ]
+      }
+    ],
+    "ensemble": {
+      "n_iris": 238,
+      "population": 470173,
+      "medianes": {
+        "revenu_med": 24980,
+        "pct_sansdip": 20.1,
+        "pct_ouvriers": 11.8,
+        "pct_immigres": 3.4,
+        "pct_surocc": 2
+      },
+      "moyennes": {
+        "revenu_med": 25286,
+        "pct_sansdip": 21.5,
+        "pct_ouvriers": 12,
+        "pct_immigres": 5,
+        "pct_surocc": 2.8
+      },
+      "ecarts_types": {
+        "revenu_med": 3417,
+        "pct_sansdip": 7.4,
+        "pct_ouvriers": 4.8,
+        "pct_immigres": 5.3,
+        "pct_surocc": 2.7
+      }
+    },
+    "croisement_departement": {
+      "description": "Nombre d'IRIS selon leur niveau dans le département entier (lignes) et dans la classification Rhône hors Métropole (colonnes)",
+      "meme_niveau_pct": 45.4,
+      "cellules": [
+        {
+          "niveau_departement": 1,
+          "niveau_territoire": 1,
+          "n_iris": 30
+        },
+        {
+          "niveau_departement": 2,
+          "niveau_territoire": 1,
+          "n_iris": 42
+        },
+        {
+          "niveau_departement": 2,
+          "niveau_territoire": 2,
+          "n_iris": 58
+        },
+        {
+          "niveau_departement": 4,
+          "niveau_territoire": 2,
+          "n_iris": 41
+        },
+        {
+          "niveau_departement": 4,
+          "niveau_territoire": 3,
+          "n_iris": 46
+        },
+        {
+          "niveau_departement": 4,
+          "niveau_territoire": 4,
+          "n_iris": 16
+        },
+        {
+          "niveau_departement": 5,
+          "niveau_territoire": 4,
+          "n_iris": 1
+        },
+        {
+          "niveau_departement": 5,
+          "niveau_territoire": 5,
+          "n_iris": 4
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Classification - Typologie socio-économique des IRIS du Rhône</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/clair.css">
+</head>
+<body data-page="classification" class="theme-clair">
+
+  <header class="entete">
+    <div class="conteneur">
+      <a class="logo" href="index.html" aria-label="Accueil">
+        <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+          <rect x="1"  y="17" width="4" height="12" rx="1.5" fill="#1B5E20"/>
+          <rect x="7"  y="13" width="4" height="16" rx="1.5" fill="#66BB6A"/>
+          <rect x="13" y="9"  width="4" height="20" rx="1.5" fill="#FFD54F"/>
+          <rect x="19" y="5"  width="4" height="24" rx="1.5" fill="#FF8A65"/>
+          <rect x="25" y="1"  width="4" height="28" rx="1.5" fill="#D32F2F"/>
+        </svg>
+        <span>Typologie socio-économique<small>des IRIS du Rhône</small></span>
+      </a>
+      <nav class="nav" aria-label="Navigation principale">
+        <a href="index.html" data-page="accueil">Accueil</a>
+        <a href="classification.html" data-page="classification">Classification</a>
+        <a href="carte.html" data-page="carte">Carte</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="bloc" style="padding-bottom: 24px;">
+      <div class="conteneur">
+        <div class="surtitre">Classification</div>
+        <h1 style="font-size: clamp(1.9rem, 4vw, 2.8rem);">Niveaux de vulnérabilité par territoire</h1>
+        <p class="discret" style="max-width: 760px;">
+          Pour chaque territoire : une ACP normée sur les 5 indicateurs, puis une classification
+          ascendante hiérarchique (Ward) en 5 classes, ordonnées de la vulnérabilité très faible
+          à très élevée.
+        </p>
+        <div class="onglets" role="tablist" id="onglets" aria-label="Territoire"></div>
+      </div>
+    </section>
+
+    <!-- Synthèse -->
+    <section class="bloc" style="padding-top: 0;">
+      <div class="conteneur">
+        <div class="grille g4" id="kpi"></div>
+        <p class="avertissement" id="avertissement" style="margin-top: 16px;"></p>
+
+        <div class="carte-info" style="margin-top: 16px;">
+          <h3>Répartition des IRIS et de la population</h3>
+          <p class="tres-discret" style="margin:0">IRIS</p>
+          <div id="barre-iris"></div>
+          <p class="tres-discret" style="margin:8px 0 0">Population</p>
+          <div id="barre-pop"></div>
+          <div id="legende-rep"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Classes -->
+    <section class="bloc" style="padding-top: 16px;">
+      <div class="conteneur">
+        <header>
+          <div class="surtitre">Les 5 classes</div>
+          <h2>Portrait des classes</h2>
+        </header>
+        <div class="grille g5" id="classes"></div>
+      </div>
+    </section>
+
+    <!-- Profils -->
+    <section class="bloc" style="padding-top: 16px;">
+      <div class="conteneur">
+        <header style="display:flex; align-items:end; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+          <div>
+            <div class="surtitre">Profils</div>
+            <h2>Valeurs des indicateurs par classe</h2>
+          </div>
+          <div class="commutateur" id="commutateur-stat" role="group" aria-label="Statistique">
+            <button type="button" data-stat="medianes" aria-pressed="true">Médianes</button>
+            <button type="button" data-stat="moyennes" aria-pressed="false">Moyennes</button>
+          </div>
+        </header>
+        <div class="tableau-conteneur"><table class="donnees" id="table-profils"></table></div>
+
+        <h3 style="margin-top: 32px;">Écarts à la moyenne du territoire (z-scores)</h3>
+        <p class="tres-discret">Bleu = en dessous de la moyenne du territoire, rouge = au-dessus ; en écarts-types.</p>
+        <div class="tableau-conteneur"><table class="donnees" id="table-z"></table></div>
+      </div>
+    </section>
+
+    <!-- Croisement -->
+    <section class="bloc" style="padding-top: 16px;" id="bloc-croisement">
+      <div class="conteneur">
+        <header>
+          <div class="surtitre">Changement d'échelle</div>
+          <h2>Même IRIS, deux classifications</h2>
+          <p id="croisement-intro"></p>
+        </header>
+        <div class="tableau-conteneur"><table class="donnees" id="table-croisement"></table></div>
+      </div>
+    </section>
+
+    <!-- Qualité statistique -->
+    <section class="bloc" style="padding-top: 16px;">
+      <div class="conteneur">
+        <header>
+          <div class="surtitre">Qualité statistique</div>
+          <h2>ACP et classification</h2>
+        </header>
+        <div class="grille g3">
+          <div class="carte-info">
+            <h3>Inertie par axe de l'ACP</h3>
+            <p class="tres-discret">En bleu : axes retenus pour la classification. Pointillé : critère de Kaiser.</p>
+            <div id="histo-acp"></div>
+          </div>
+          <div class="carte-info">
+            <h3>Silhouette selon le nombre de classes</h3>
+            <p class="tres-discret">Plus elle est haute, mieux les classes sont séparées. K = 5 retenu.</p>
+            <div id="histo-k"></div>
+          </div>
+        </div>
+        <div class="tableau-conteneur" style="margin-top: 16px;"><table class="donnees" id="table-acp"></table></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pied">
+    <div class="conteneur">
+      <div>Données exportées le <span data-date-export>–</span> · <a href="data/classifications.json">classifications.json</a></div>
+    </div>
+  </footer>
+
+  <script src="js/commun.js"></script>
+  <script src="js/classification.js"></script>
+</body>
+</html>

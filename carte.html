@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Carte - Typologie socio-économique des IRIS du Rhône</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <!-- Leaflet 1.9.4 inclus dans le dossier (fonctionne sans CDN) -->
+  <link rel="stylesheet" href="lib/leaflet/leaflet.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="carte" class="page-carte">
+
+  <header class="entete">
+    <div class="conteneur" style="width: calc(100% - 32px); max-width: none;">
+      <a class="logo" href="index.html" aria-label="Accueil">
+        <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+          <rect x="1"  y="17" width="4" height="12" rx="1.5" fill="#1B5E20"/>
+          <rect x="7"  y="13" width="4" height="16" rx="1.5" fill="#66BB6A"/>
+          <rect x="13" y="9"  width="4" height="20" rx="1.5" fill="#FFD54F"/>
+          <rect x="19" y="5"  width="4" height="24" rx="1.5" fill="#FF8A65"/>
+          <rect x="25" y="1"  width="4" height="28" rx="1.5" fill="#D32F2F"/>
+        </svg>
+        <span>Typologie socio-économique<small>des IRIS du Rhône</small></span>
+      </a>
+      <nav class="nav" aria-label="Navigation principale">
+        <a href="index.html" data-page="accueil">Accueil</a>
+        <a href="classification.html" data-page="classification">Classification</a>
+        <a href="carte.html" data-page="carte">Carte</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="carte-mise-en-page">
+    <aside class="panneau" id="panneau" aria-label="Réglages de la carte">
+
+      <div class="groupe">
+        <div class="recherche">
+          <div class="champ" style="padding: 2px 2px 2px 14px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6F7D95" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input id="recherche" type="search" autocomplete="off" placeholder="IRIS ou commune…"
+                   aria-label="Rechercher un IRIS ou une commune" aria-controls="resultats">
+          </div>
+          <ul class="resultats" id="resultats" role="listbox" hidden></ul>
+        </div>
+      </div>
+
+      <div class="groupe">
+        <h2>Classification</h2>
+        <div class="choix-territoire" id="choix-territoire"></div>
+        <p class="tres-discret" style="margin: 8px 0 0;">Niveaux relatifs au territoire choisi.</p>
+      </div>
+
+      <div class="groupe" id="fiche-groupe">
+        <h2>IRIS sélectionné</h2>
+        <div class="fiche" id="fiche"><p class="tres-discret">Cliquez sur un IRIS de la carte.</p></div>
+      </div>
+
+      <div class="groupe options">
+        <h2>Couches</h2>
+        <label id="option-qpv"><input type="checkbox" id="couche-qpv" checked>
+          <span class="trait" style="border-top: 3px solid #38BDF8;"></span> QPV de la Métropole</label>
+        <label id="option-qpv2024"><input type="checkbox" id="couche-qpv2024" checked>
+          <span class="trait" style="border-top: 3px dashed #F472B6;"></span> QPV 2024 du département (ANCT)</label>
+        <label><input type="checkbox" data-limite="departement" checked>
+          <span class="trait" style="border-top: 3px solid #F8FAFC;"></span> Limite du département</label>
+        <label><input type="checkbox" data-limite="metropole" checked>
+          <span class="trait" style="border-top: 3px dashed #C084FC;"></span> Limite de la Métropole</label>
+        <label><input type="checkbox" data-limite="hors_metropole">
+          <span class="trait" style="border-top: 3px dotted #FBBF24;"></span> Limite du Rhône hors Métropole</label>
+        <label title="Collines en altitude dans la vue 3D. À décocher si la vue 3D est lente."><input type="checkbox" id="couche-relief" checked>
+          <span class="trait" style="border-top: 3px solid #A8977B;"></span> Relief (vue 3D)</label>
+      </div>
+
+      <div class="groupe">
+        <h2>Fond de carte</h2>
+        <select class="selecteur" id="fond" aria-label="Fond de carte">
+          <option value="sombre">Sombre (Esri)</option>
+          <option value="clair">Clair (Esri)</option>
+          <option value="ign">Plan IGN</option>
+          <option value="photo">Photo aérienne IGN</option>
+          <option value="aucun">Aucun</option>
+          <option value="3d">Vue 3D - bâtiments (OpenFreeMap)</option>
+        </select>
+      </div>
+    </aside>
+
+    <div style="position: relative; min-height: 0;">
+      <div id="carte" role="region" aria-label="Carte des IRIS"></div>
+      <div id="carte3d" role="region" aria-label="Vue 3D des IRIS et des bâtiments" hidden></div>
+      <button class="bouton bouton-panneau" id="bouton-panneau" type="button" aria-controls="panneau">Réglages</button>
+    </div>
+  </div>
+
+  <script src="lib/leaflet/leaflet.js"></script>
+  <script src="js/commun.js"></script>
+  <script src="js/carte3d.js"></script>
+  <script src="js/carte.js"></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+/* =============================================================================
+   clair.css - thème clair commun (chargé après style.css)
+   S'applique aux pages dont le <body> porte la classe "theme-clair" :
+   accueil et classification. La page Carte garde le thème sombre de style.css.
+   ============================================================================= */
+
+.theme-clair {
+  --fond:        #F6F4EF;
+  --surface:     #FFFFFF;
+  --surface-2:   #EFECE5;
+  --surface-3:   #E5E0D6;
+  --bordure:     #E0DBD0;
+  --bordure-2:   #C9C2B4;
+  --texte:       #1E1E1C;
+  --texte-2:     #57534C;
+  --texte-3:     #86817A;
+  --accent:      #1F4E79;
+  --accent-fort: #1F4E79;
+  --accent-doux: rgba(31, 78, 121, .10);
+  --police-titres: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --rayon:   6px;
+  --rayon-s: 4px;
+  --largeur: 1520px;
+  font-size: 16px;
+}
+.theme-clair a:not(.bouton) { color: var(--accent); }
+.theme-clair h1, .theme-clair h2, .theme-clair h3 { font-weight: 600; letter-spacing: 0; }
+
+/* ---------- Largeur : conteneur élargi, marges latérales de 40 px (16 px sur mobile) ---------- */
+.theme-clair .conteneur { width: min(var(--largeur), 100% - 80px); }
+.theme-clair section.bloc > .conteneur > header p { max-width: 900px; }
+.theme-clair .grille { gap: 24px; }
+.theme-clair .carte-info { padding: 26px 28px; box-shadow: 0 1px 2px rgba(30, 30, 28, .05); }
+
+/* ---------- En-tête clair ---------- */
+.theme-clair .entete { background: rgba(255, 255, 255, .94); }
+.theme-clair .logo small { color: var(--texte-3); }
+.theme-clair .nav a { border-radius: 0; padding: 8px 4px; margin-left: 18px; color: var(--texte-2); }
+.theme-clair .nav a:hover { background: none; color: var(--texte); }
+.theme-clair .nav a.actif { background: none; color: var(--texte); box-shadow: inset 0 -2px 0 var(--accent); }
+
+/* ---------- Boutons, onglets ---------- */
+.theme-clair .bouton { border-radius: var(--rayon-s); padding: 10px 16px; font-size: .92rem; }
+.theme-clair .bouton:hover { background: #173B5C; }
+.theme-clair .bouton.secondaire { color: var(--texte); background: var(--surface); }
+.theme-clair .bouton.secondaire:hover { background: var(--surface-2); }
+.theme-clair .onglets { border-radius: var(--rayon); }
+.theme-clair .onglets button { border-radius: var(--rayon-s); }
+
+/* ---------- Recherche ---------- */
+.theme-clair .recherche .champ {
+  border-radius: var(--rayon-s); padding: 4px 4px 4px 14px; color: var(--texte-3);
+  background: var(--surface); border-color: var(--bordure-2);
+}
+.theme-clair .recherche .champ:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-doux); }
+.theme-clair .resultats { background: var(--surface); box-shadow: 0 10px 28px rgba(30, 30, 28, .14); }
+.theme-clair .resultats li[aria-selected="true"], .theme-clair .resultats li:hover { background: var(--surface-2); }
+
+/* ---------- Sections ---------- */
+.theme-clair section.bloc { padding: 64px 0; }
+.theme-clair .surtitre {
+  color: var(--texte-2); font-size: .85rem; font-weight: 600; letter-spacing: 0; text-transform: none; margin-bottom: 10px;
+}
+.theme-clair .surtitre span { color: var(--accent); font-family: var(--police-titres); margin-right: 6px; }
+.theme-clair h2 { font-size: clamp(1.6rem, 2.8vw, 2.1rem); }
+.theme-clair .avertissement { background: #FBF4E4; border-left-color: #B7791F; color: #5B4413; }
+
+/* ---------- Infobulle : claire aussi (sinon texte sombre sur fond sombre) ---------- */
+.theme-clair .infobulle { background: #FFFFFF; color: var(--texte); border-color: var(--bordure-2); box-shadow: 0 10px 28px rgba(30, 30, 28, .18); }
+
+/* ---------- Tableaux et éléments de la page Classification ---------- */
+.theme-clair table.donnees thead th { background: var(--surface-2); }
+.theme-clair td.diagonale { outline-color: rgba(30, 30, 28, .6); }
+.theme-clair .stabilite.Stable   { color: #166534; border-color: rgba(22, 101, 52, .4); }
+.theme-clair .stabilite.Modérée  { color: #8A5A00; border-color: rgba(138, 90, 0, .4); }
+.theme-clair .stabilite.Fragile  { color: #B42318; border-color: rgba(180, 35, 24, .4); }
+.theme-clair .tuile .valeur { font-weight: 600; }
+
+/* ---------- Pied de page ---------- */
+.theme-clair .pied { background: var(--surface); margin-top: 24px; }
+
+@media (max-width: 560px) {
+  .theme-clair .conteneur { width: calc(100% - 32px); }
+  .theme-clair .nav a { margin-left: 10px; }
+}

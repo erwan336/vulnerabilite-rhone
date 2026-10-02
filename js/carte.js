@@ -1,0 +1,463 @@
+/* =============================================================================
+   carte.js - page carte.html (Leaflet ; vue 3D optionnelle dans carte3d.js)
+   Paramètres d'adresse possibles :
+     carte.html?territoire=metropole     classification affichée au départ
+     carte.html?iris=693830105           IRIS sélectionné et zoomé
+     carte.html?commune=69266            zoom sur une commune
+     carte.html?territoire=metropole&niveau=5   un seul niveau affiché
+     carte.html?fond=3d&commune=69381    vue 3D (bâtiments) sur une commune
+   ============================================================================= */
+(function () {
+  "use strict";
+  const S = window.Site;
+
+  /* ---------- Fonds de carte (sans clé d'API) ---------- */
+  const IGN = "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&STYLE=normal" +
+              "&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
+  // CARTO renvoie désormais des tuiles « API KEY REQUIRED » : fonds gris Esri (sans clé).
+  const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/";
+  const fondEsri = nom => L.tileLayer(ESRI + nom + "/MapServer/tile/{z}/{y}/{x}",
+    { maxZoom: 19, maxNativeZoom: 16, attribution: "&copy; Esri, HERE, Garmin, &copy; OpenStreetMap" });
+  const FONDS = {
+    sombre: fondEsri("World_Dark_Gray_Base"),
+    clair: fondEsri("World_Light_Gray_Base"),
+    ign: L.tileLayer(IGN + "&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&FORMAT=image/png",
+      { maxZoom: 19, attribution: "&copy; IGN - Géoplateforme" }),
+    photo: L.tileLayer(IGN + "&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&FORMAT=image/jpeg",
+      { maxZoom: 19, attribution: "&copy; IGN - Géoplateforme" }),
+    aucun: null
+  };
+  const FONDS_CLAIRS = ["clair", "ign", "photo"];
+
+  /* ---------- Carte ---------- */
+  // Inertie adoucie : la carte s'arrête vite après un glisser au lieu de continuer sur sa lancée
+  const map = L.map("carte", {
+    zoomSnap: 0.5, inertiaDeceleration: 6000, inertiaMaxSpeed: 1200, easeLinearity: 0.4
+  }).setView([45.87, 4.64], 9);
+  window.carteLeaflet = map;   // accessible dans la console du navigateur (mise au point)
+  map.createPane("qpv").style.zIndex = 440;
+  const paneLimites = map.createPane("limites");
+  paneLimites.style.zIndex = 450;
+  paneLimites.style.pointerEvents = "none";
+  L.control.scale({ imperial: false, position: "bottomright" }).addTo(map);
+
+  let fondActif = null, nomFond = "sombre", mode3D = false;
+  function changerFond(nom) {
+    if (nom === "3d") { activer3D(); return; }
+    if (mode3D) desactiver3D();
+    if (fondActif) map.removeLayer(fondActif);
+    nomFond = nom;
+    fondActif = FONDS[nom];
+    if (fondActif) fondActif.addTo(map);
+    document.getElementById("carte").style.background = FONDS_CLAIRS.indexOf(nom) >= 0 ? "#F1F5F9" : "#0B1120";
+    styliserLimites();
+    if (groupeIris) groupeIris.eachLayer(function (l) { l.setStyle(styleIris(l.feature)); });
+  }
+
+  /* ---------- État ---------- */
+  let DONNEES, META, NIV, CLASSIF, TERR = "departement", groupeIris = null, limites = null, qpv = null, selection = null;
+  const calques = {};          // code_iris -> calque Leaflet
+  const visibles = {};         // code de niveau -> true/false
+  const stats = {};            // territoire -> variable -> {tri, min, max, med}
+
+  S.chargerTout(["meta", "classifications", "iris", "irisGeo", "limites", "qpv", "qpv2024"], ["qpv", "qpv2024"]).then(function (d) {
+    DONNEES = d;
+    META = d.meta; NIV = S.niveauxParCode(META); CLASSIF = d.classifications;
+    META.niveaux.forEach(function (n) { visibles[n.code] = true; });
+
+    // Paramètres d'adresse
+    const pTerr = S.parametre("territoire");
+    if (pTerr && META.territoires.some(function (t) { return t.id === pTerr; })) TERR = pTerr;
+    const pNiv = S.parametre("niveau");
+    if (pNiv !== null && NIV[pNiv]) META.niveaux.forEach(function (n) { visibles[n.code] = String(n.code) === pNiv; });
+
+    calculerStats(d.iris);
+    construireChoixTerritoire();
+    creerLegende();
+
+    // IRIS
+    groupeIris = L.geoJSON(d.irisGeo, {
+      style: styleIris,
+      onEachFeature: function (f, l) {
+        calques[f.properties.code_iris] = l;
+        l.bindTooltip(function () { return etiquette(f.properties); },
+          { sticky: true, className: "etiquette-iris", direction: "top", offset: [0, -8] });
+        // Pas de surbrillance ni de bringToFront pendant un glisser : déplacer le <path> sous la souris
+        // fait perdre le relâchement du bouton, et la carte continue de suivre le curseur.
+        l.on("mouseover", function (e) {
+          if (map.dragging.moving() || (e.originalEvent && e.originalEvent.buttons)) return;
+          if (l !== selection) l.setStyle({ weight: 2, color: "#FFFFFF" });
+          l.bringToFront();
+        });
+        l.on("mouseout", function (e) {
+          l.setStyle(styleIris(f));
+          if (selection && !(e.originalEvent && e.originalEvent.buttons)) selection.bringToFront();
+        });
+        l.on("click", function () { selectionner(f.properties.code_iris, false); });
+      }
+    }).addTo(map);
+
+    // Limites
+    limites = L.geoJSON(d.limites, { pane: "limites", interactive: false, style: styleLimite });
+    limites.addTo(map);
+    document.querySelectorAll("[data-limite]").forEach(function (cb) {
+      cb.addEventListener("change", styliserLimites);
+    });
+
+    // QPV 2024 (ANCT) sur tout le département : rose, en tirets pour rester lisible
+    // là où ils se superposent aux QPV de la Métropole (cyan, trait plein).
+    if (d.qpv2024) {
+      const qpv2024 = L.geoJSON(d.qpv2024, {
+        pane: "qpv",
+        style: { color: "#F472B6", weight: 2.5, dashArray: "6 4", fill: false, opacity: 1 },
+        onEachFeature: function (f, l) {
+          l.bindTooltip("QPV 2024 : " + S.echapper(f.properties.nom) + "<br>" + S.echapper(f.properties.commune),
+            { sticky: true, className: "etiquette-iris" });
+        }
+      }).addTo(map);
+      document.getElementById("couche-qpv2024").addEventListener("change", function (e) {
+        if (e.target.checked) qpv2024.addTo(map); else map.removeLayer(qpv2024);
+      });
+    } else {
+      document.getElementById("option-qpv2024").hidden = true;
+    }
+
+    // QPV
+    if (d.qpv) {
+      qpv = L.geoJSON(d.qpv, {
+        pane: "qpv",
+        style: { color: "#38BDF8", weight: 2, fill: false, opacity: 0.95 },
+        onEachFeature: function (f, l) {
+          l.bindTooltip("QPV : " + S.echapper(f.properties.nom), { sticky: true, className: "etiquette-iris" });
+        }
+      }).addTo(map);
+      document.getElementById("couche-qpv").addEventListener("change", function (e) {
+        if (e.target.checked) qpv.addTo(map); else map.removeLayer(qpv);
+      });
+    } else {
+      document.getElementById("option-qpv").hidden = true;
+    }
+
+    document.getElementById("fond").addEventListener("change", function (e) { changerFond(e.target.value); });
+    changerFond("sombre");
+    appliquer();
+
+    // Recherche
+    S.recherche(document.getElementById("recherche"), document.getElementById("resultats"), d.iris, function (e) {
+      if (e.type === "iris") selectionner(e.code, true); else zoomCommune(e.code);
+    });
+
+    // Position de départ
+    const pIris = S.parametre("iris"), pCom = S.parametre("commune");
+    if (pIris && calques[pIris]) selectionner(pIris, true);
+    else if (pCom) zoomCommune(pCom);
+    else cadrerTerritoire();
+
+    // Fond demandé dans l'adresse (ex. carte.html?fond=3d&commune=69123)
+    const pFond = S.parametre("fond");
+    if (pFond && document.querySelector('#fond option[value="' + pFond + '"]')) {
+      document.getElementById("fond").value = pFond;
+      changerFond(pFond);
+    }
+
+    // Panneau sur mobile
+    document.getElementById("bouton-panneau").addEventListener("click", function () {
+      basculerPanneau(!document.getElementById("panneau").classList.contains("ouvert"));
+    });
+  }).catch(function () {});
+
+  /* ---------- Vue 3D (MapLibre, voir carte3d.js) ---------- */
+  function cadrer(b, zoomMax, marge) {
+    if (mode3D) Carte3D.cadrer([[b.getSouth(), b.getWest()], [b.getNorth(), b.getEast()]], zoomMax + 1);
+    else map.fitBounds(b, { maxZoom: zoomMax, padding: marge });
+  }
+  function couleur3D(p) {
+    const c = codeNiveau(p);
+    if (c === null || c === undefined || !visibles[c] || !NIV[c]) return null;
+    return NIV[c].couleur;
+  }
+  function deplacerLegende(versCarte3D) {
+    const leg = document.querySelector(".legende-flottante");
+    if (!leg) return;
+    if (versCarte3D) {
+      leg.dataset.parent = "leaflet";
+      leg.classList.add("hors-leaflet");
+      document.getElementById("carte3d").parentNode.appendChild(leg);
+    } else if (leg.dataset.parent) {
+      leg.classList.remove("hors-leaflet");
+      document.querySelector(".leaflet-top.leaflet-right").appendChild(leg);
+    }
+  }
+  function activer3D() {
+    const c = map.getCenter();
+    mode3D = true;
+    deplacerLegende(true);
+    Carte3D.ouvrir(document.getElementById("carte3d"), {
+      irisGeo: DONNEES.irisGeo, limites: DONNEES.limites, qpv: DONNEES.qpv, qpv2024: DONNEES.qpv2024,
+      couleur: couleur3D,
+      selection: function () { return selection ? selection.feature.properties.code_iris : null; },
+      etiquette: etiquette,
+      onClic: function (code) { selectionner(code, false); }
+    }, c, map.getZoom() + 1).catch(function () {
+      // MapLibre ou le fond OpenFreeMap n'a pas pu être chargé : retour en 2D
+      alert("La vue 3D n'a pas pu être chargée (connexion internet nécessaire).");
+      document.getElementById("fond").value = "sombre";
+      changerFond("sombre");
+    });
+  }
+  function desactiver3D() {
+    const v = Carte3D.vue();
+    mode3D = false;
+    Carte3D.fermer(document.getElementById("carte3d"));
+    deplacerLegende(false);
+    if (v) map.setView([v.lat, v.lng], Math.max(8, Math.min(18, Math.round((v.zoom - 1) * 2) / 2)), { animate: false });
+    map.invalidateSize();
+  }
+
+  /* ---------- Styles ---------- */
+  function codeNiveau(p) { return p["niveau_" + TERR]; }
+  function styleIris(f) {
+    const code = codeNiveau(f.properties);
+    const n = NIV[code];
+    const clair = FONDS_CLAIRS.indexOf(nomFond) >= 0;
+    const sel = selection && selection.feature === f;
+    return {
+      fillColor: n ? n.couleur : "#000",
+      fillOpacity: code === 0 ? 0.6 : 0.88,
+      color: sel ? "#FFFFFF" : (clair ? "#FFFFFF" : "#0A0F1C"),
+      weight: sel ? 3.5 : 0.6,
+      opacity: 1
+    };
+  }
+  function styleLimite(f) {
+    const clair = FONDS_CLAIRS.indexOf(nomFond) >= 0;
+    const coche = document.querySelector('[data-limite="' + f.properties.id + '"]');
+    const visible = coche ? coche.checked : true;
+    const base = {
+      departement:    { color: clair ? "#111827" : "#F8FAFC", weight: 2.5, dashArray: null },
+      metropole:      { color: clair ? "#7E22CE" : "#C084FC", weight: 2.5, dashArray: "8 6" },
+      hors_metropole: { color: clair ? "#B45309" : "#FBBF24", weight: 2.5, dashArray: "2 6" }
+    }[f.properties.id] || { color: "#fff", weight: 2 };
+    base.fill = false;
+    base.opacity = visible ? 1 : 0;
+    return base;
+  }
+  function styliserLimites() { if (limites) limites.setStyle(styleLimite); }
+
+  function etiquette(p) {
+    const n = NIV[codeNiveau(p)];
+    return "<strong>" + S.echapper(p.nom_iris) + "</strong><br>" + S.echapper(p.commune) +
+      (n ? "<br>" + S.echapper(n.libelle_long) : "");
+  }
+
+  /* ---------- Application du territoire et des niveaux cochés ---------- */
+  function appliquer() {
+    const comptes = {}, pops = {};
+    Object.keys(calques).forEach(function (code) {
+      const l = calques[code], c = codeNiveau(l.feature.properties);
+      if (c === null || c === undefined) { groupeIris.removeLayer(l); return; }
+      comptes[c] = (comptes[c] || 0) + 1;
+      pops[c] = (pops[c] || 0) + (l.feature.properties.population || 0);
+      if (visibles[c]) {
+        if (!groupeIris.hasLayer(l)) groupeIris.addLayer(l);
+        l.setStyle(styleIris(l.feature));
+      } else {
+        groupeIris.removeLayer(l);
+      }
+    });
+    if (selection) selection.bringToFront();
+    construireLegende(comptes, pops);
+    document.querySelectorAll("#choix-territoire button").forEach(function (b) {
+      b.setAttribute("aria-pressed", b.dataset.terr === TERR);
+    });
+    if (selection) afficherFiche(selection.feature.properties);
+    if (mode3D) Carte3D.maj();
+  }
+
+  function construireChoixTerritoire() {
+    const div = document.getElementById("choix-territoire");
+    div.innerHTML = META.territoires.map(function (t) {
+      return '<button type="button" data-terr="' + t.id + '"><span>' + S.echapper(t.titre) +
+        '</span><span class="nb">' + S.nombre(t.n_iris_classes) + " IRIS</span></button>";
+    }).join("");
+    div.querySelectorAll("button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        TERR = b.dataset.terr;
+        // IRIS sélectionné hors du nouveau territoire : on le désélectionne
+        if (selection && codeNiveau(selection.feature.properties) == null) deselectionner();
+        appliquer();
+        const u = new URL(window.location.href);
+        u.searchParams.set("territoire", TERR); history.replaceState(null, "", u);
+      });
+    });
+  }
+
+  /* ---------- Légende flottante (contrôle Leaflet en haut à droite) ---------- */
+  function popCourte(x) {
+    if (x >= 1e6) return S.nombre(x / 1e6, 1).replace(/,0$/, "") + " M";
+    if (x >= 1e4) return S.nombre(x / 1e3) + " k";
+    return S.nombre(x);
+  }
+  function creerLegende() {
+    const ctrl = L.control({ position: "topright" });
+    ctrl.onAdd = function () {
+      const div = L.DomUtil.create("div", "legende-flottante");
+      if (window.matchMedia("(max-width: 860px)").matches) div.classList.add("repliee");
+      div.innerHTML =
+        '<button type="button" class="legende-entete" aria-expanded="' + !div.classList.contains("repliee") + '">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>' +
+        "<span>Légende</span>" +
+        '<svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button>' +
+        '<div class="legende-corps" id="legende-corps"></div>';
+      div.querySelector(".legende-entete").addEventListener("click", function () {
+        const repliee = div.classList.toggle("repliee");
+        this.setAttribute("aria-expanded", !repliee);
+      });
+      L.DomEvent.disableClickPropagation(div);
+      L.DomEvent.disableScrollPropagation(div);
+      return div;
+    };
+    ctrl.addTo(map);
+  }
+
+  function construireLegende(comptes, pops) {
+    const corps = document.getElementById("legende-corps");
+    const terr = META.territoires.find(function (t) { return t.id === TERR; }) || {};
+    const classes = META.niveaux.filter(function (n) { return n.code > 0; });
+    const ordre = classes.concat(META.niveaux.filter(function (n) { return n.code === 0; }));
+    const nClasses = classes.reduce(function (s, n) { return s + (comptes[n.code] || 0); }, 0);
+
+    corps.innerHTML =
+      '<p class="legende-sous-titre">ACP + CAH · ' + S.echapper(terr.titre) + " · IRIS</p>" +
+      '<div class="legende-bornes"><span>Moins vulnérable</span><span>Plus vulnérable</span></div>' +
+      '<div class="legende-degrade" style="background:linear-gradient(90deg,' +
+        classes.map(function (n) { return n.couleur; }).join(",") + ')"></div>' +
+      '<div class="legende-lignes">' + ordre.map(function (n) {
+        const nb = comptes[n.code] || 0;
+        return '<label class="' + (nb ? "" : "vide") + '"><input type="checkbox" data-code="' + n.code + '"' +
+          (visibles[n.code] ? " checked" : "") + '><span class="rond" style="background:' + n.couleur + '"></span>' +
+          '<span class="nom">' + S.echapper(n.libelle) + "</span>" +
+          '<span class="nb">' + S.nombre(nb) + " · " + popCourte(pops[n.code] || 0) + " hab</span></label>";
+      }).join("") + "</div>" +
+      '<p class="legende-note">Population : recensement 2022</p>' +
+      '<dl class="legende-resume">' +
+        "<dt>IRIS classés</dt><dd>" + S.nombre(nClasses) + "</dd>" +
+        "<dt>Méthode</dt><dd>ACP + CAH (Ward)</dd>" +
+        "<dt>Données</dt><dd>RP 2022 · Filosofi 2021</dd>" +
+        "<dt>Silhouette</dt><dd>" + S.nombre(terr.silhouette, 2) + "</dd></dl>" +
+      '<a class="legende-bouton" href="classification.html#' + TERR + '">En savoir plus</a>';
+
+    corps.querySelectorAll("input").forEach(function (cb) {
+      cb.addEventListener("change", function () { visibles[cb.dataset.code] = cb.checked; appliquer(); });
+    });
+  }
+
+  /* ---------- Sélection / fiche ---------- */
+  function selectionner(code, zoomer) {
+    const l = calques[code];
+    if (!l) return;
+    if (codeNiveau(l.feature.properties) == null) {       // IRIS hors du territoire affiché
+      TERR = "departement";
+    }
+    const c = codeNiveau(l.feature.properties);
+    if (!visibles[c]) visibles[c] = true;
+    const ancienne = selection;
+    selection = l;
+    if (ancienne) ancienne.setStyle(styleIris(ancienne.feature));
+    appliquer();
+    l.setStyle(styleIris(l.feature)); l.bringToFront();
+    if (zoomer) cadrer(l.getBounds(), 15, [40, 40]);
+    const u = new URL(window.location.href);
+    u.searchParams.set("iris", code); history.replaceState(null, "", u);
+  }
+  function deselectionner() {
+    const l = selection; selection = null;
+    if (l) l.setStyle(styleIris(l.feature));
+    document.getElementById("fiche").innerHTML = '<p class="tres-discret">Cliquez sur un IRIS de la carte.</p>';
+  }
+  function zoomCommune(codeCommune) {
+    let b = null;
+    Object.keys(calques).forEach(function (k) {
+      const l = calques[k];
+      if (l.feature.properties.code_commune === codeCommune) b = b ? b.extend(l.getBounds()) : L.latLngBounds(l.getBounds().getSouthWest(), l.getBounds().getNorthEast());
+    });
+    if (b) cadrer(b, 14, [30, 30]);
+  }
+  function cadrerTerritoire() {
+    let b = null;
+    groupeIris.eachLayer(function (l) { b = b ? b.extend(l.getBounds()) : L.latLngBounds(l.getBounds().getSouthWest(), l.getBounds().getNorthEast()); });
+    if (b) map.fitBounds(b, { padding: [20, 20] });
+  }
+
+  const TYPES_IRIS = { H: "IRIS d'habitat", A: "IRIS d'activité", D: "IRIS divers", Z: "commune non découpée" };
+
+  function afficherFiche(p) {
+    const terrPropre = p.territoire;             // metropole / hors_metropole
+    const titres = {};
+    META.territoires.forEach(function (t) { titres[t.id] = t.titre; });
+    const lignesNiveaux = ["departement", terrPropre].map(function (t) {
+      const c = p["niveau_" + t];
+      const n = NIV[c];
+      return '<div class="ligne-niveau"' + (t === TERR ? ' style="font-weight:600"' : "") + "><span>" +
+        S.echapper(titres[t]) + (t === TERR ? " (affichée)" : "") + "</span>" + S.badge(n, n ? n.libelle : "") + "</div>";
+    }).join("");
+
+    const st = stats[TERR];
+    const variables = META.variables.map(function (v) {
+      const x = p[v.id];
+      if (x === null || x === undefined) {
+        return '<div class="variable"><div class="haut"><span>' + S.echapper(v.libelle) + "</span><strong>n.d.</strong></div></div>";
+      }
+      const s = st[v.id];
+      const medTerr = CLASSIF[TERR] ? CLASSIF[TERR].ensemble.medianes[v.id] : s.med;   // même valeur que la page Classification
+      const pos = s.max > s.min ? Math.max(0, Math.min(1, (x - s.min) / (s.max - s.min))) : 0;
+      const med = s.max > s.min ? (medTerr - s.min) / (s.max - s.min) : 0;
+      const rang = centile(s.tri, x);
+      return '<div class="variable"><div class="haut"><span>' + S.echapper(v.libelle) + "</span><strong>" +
+        S.valeur(META, v.id, x) + "</strong></div>" +
+        '<div class="jauge" title="Barre blanche : médiane du territoire"><div class="rempli" style="width:' + (100 * pos).toFixed(1) +
+        '%"></div><div class="mediane" style="left:' + (100 * med).toFixed(1) + '%"></div></div>' +
+        '<div class="note">Médiane du territoire : ' + S.valeur(META, v.id, medTerr) + " · plus élevé que " +
+        rang + " % des IRIS</div>" +
+        (v.id === "revenu_med" && p.revenu_source === "commune" ? '<div class="note" style="color:#FDE68A">Revenu de la commune (valeur de l\'IRIS non diffusée)</div>' : "") +
+        "</div>";
+    }).join("");
+
+    document.getElementById("fiche").innerHTML =
+      "<h3>" + S.echapper(p.nom_iris) + "</h3>" +
+      '<div class="lieu">' + S.echapper(p.commune) + " · " + S.echapper(p.code_iris) + " · " +
+      S.echapper(TYPES_IRIS[p.type_iris] || p.type_iris) + " · " + S.nombre(p.population) + " hab.</div>" +
+      lignesNiveaux +
+      (p.motif_non_classe ? '<p class="note" style="color:#FDE68A">' + S.echapper(p.motif_non_classe) + "</p>" : "") +
+      variables +
+      '<p class="note" style="margin-top:10px">Jauge : position entre le minimum et le maximum des IRIS classés du territoire affiché.</p>';
+    if (window.innerWidth <= 860) basculerPanneau(true);
+  }
+
+  function basculerPanneau(ouvrir) {
+    document.getElementById("panneau").classList.toggle("ouvert", ouvrir);
+    document.getElementById("bouton-panneau").textContent = ouvrir ? "Voir la carte" : "Réglages";
+  }
+
+  /* ---------- Statistiques de référence par territoire ---------- */
+  function calculerStats(iris) {
+    META.territoires.forEach(function (t) {
+      const lignes = iris.filter(function (r) { return r["niveau_" + t.id] > 0; });
+      stats[t.id] = {};
+      META.variables.forEach(function (v) {
+        const tri = lignes.map(function (r) { return r[v.id]; }).filter(function (x) { return x !== null; })
+          .sort(function (a, b) { return a - b; });
+        const m = tri.length;
+        stats[t.id][v.id] = {
+          tri: tri, min: tri[0], max: tri[m - 1],
+          med: m % 2 ? tri[(m - 1) / 2] : (tri[m / 2 - 1] + tri[m / 2]) / 2
+        };
+      });
+    });
+  }
+  function centile(tri, x) {
+    let n = 0;
+    for (let i = 0; i < tri.length; i++) if (tri[i] < x) n++;
+    return Math.round(100 * n / tri.length);
+  }
+})();

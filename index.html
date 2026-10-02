@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Typologie socio-économique des IRIS du Rhône</title>
+  <meta name="description" content="Typologie de la vulnérabilité socio-économique des IRIS du Rhône (ACP + CAH).">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/clair.css">
+  <link rel="stylesheet" href="css/accueil.css">
+</head>
+<body data-page="accueil" class="theme-clair">
+
+  <!-- ===== En-tête (identique sur les 3 pages) ===== -->
+  <header class="entete">
+    <div class="conteneur">
+      <a class="logo" href="index.html" aria-label="Accueil">
+        <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+          <rect x="1"  y="17" width="4" height="12" rx="1.5" fill="#1B5E20"/>
+          <rect x="7"  y="13" width="4" height="16" rx="1.5" fill="#66BB6A"/>
+          <rect x="13" y="9"  width="4" height="20" rx="1.5" fill="#FFD54F"/>
+          <rect x="19" y="5"  width="4" height="24" rx="1.5" fill="#FF8A65"/>
+          <rect x="25" y="1"  width="4" height="28" rx="1.5" fill="#D32F2F"/>
+        </svg>
+        <span>Typologie socio-économique<small>des IRIS du Rhône</small></span>
+      </a>
+      <nav class="nav" aria-label="Navigation principale">
+        <a href="index.html" data-page="accueil">Accueil</a>
+        <a href="classification.html" data-page="classification">Classification</a>
+        <a href="carte.html" data-page="carte">Carte</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===== Héros : texte + carte du département ===== -->
+    <section class="heros">
+      <div class="conteneur heros-grille">
+        <div class="heros-texte">
+          <p class="kicker" id="pastille-info">Rhône (69) · données INSEE</p>
+          <h1>Classification ascendante hiérarchique (CAH) des IRIS selon leurs caractéristiques socio-économiques</h1>
+          <p class="accroche" id="accroche">
+            Cette cartographie permet d'identifier les territoires les plus fragiles du département
+            et de mieux comprendre les inégalités socio-économiques à l'échelle infracommunale,
+            à partir d'un ensemble de variables disponibles au niveau des IRIS, telles que les revenus,
+            l'emploi, le niveau de diplôme, les caractéristiques démographiques et les conditions de logement.
+          </p>
+
+          <div class="recherche" role="search">
+            <label class="etiquette-recherche" for="recherche">Rechercher un quartier ou une commune</label>
+            <div class="champ">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <input id="recherche" type="search" autocomplete="off"
+                     placeholder="Ex. Villeurbanne, Vaulx-en-Velin…"
+                     aria-controls="resultats">
+              <button class="bouton" id="bouton-recherche" type="button">Voir sur la carte</button>
+            </div>
+            <ul class="resultats" id="resultats" role="listbox" hidden></ul>
+          </div>
+
+          <p class="actions"><a href="classification.html">Comprendre la classification →</a></p>
+        </div>
+
+        <figure class="heros-carte">
+          <a class="mini-carte" id="mini-carte" href="carte.html" aria-label="Ouvrir la carte interactive"></a>
+          <figcaption>
+            <div id="legende-mini"></div>
+            <span>Niveau de vulnérabilité par IRIS, classification départementale.
+              <a href="carte.html">Ouvrir la carte interactive →</a></span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ===== Chiffres clés ===== -->
+    <section class="bandeau-chiffres">
+      <div class="conteneur">
+        <dl id="chiffres"></dl>
+      </div>
+    </section>
+
+    <!-- ===== L'enjeu (illustration santé en fond, à droite) ===== -->
+    <section class="bandeau-enjeu">
+      <div class="conteneur">
+        <div class="enjeu-texte">
+          <div class="surtitre">L'enjeu</div>
+          <h2>Repérer les territoires où les inégalités sociales pèsent sur la santé</h2>
+          <p>Les difficultés sociales se concentrent dans certains quartiers. Les repérer aide
+            à cibler les actions de prévention et de santé là où elles sont le plus utiles.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Trois échelles ===== -->
+    <section class="bloc">
+      <div class="conteneur">
+        <header>
+          <div class="surtitre"><span>01</span> Trois échelles</div>
+          <h2>Une classification par territoire</h2>
+          <p>
+            L'analyse est refaite séparément pour le département entier, la Métropole de Lyon
+            et le Rhône hors Métropole : chaque IRIS est comparé aux IRIS de son propre territoire.
+          </p>
+        </header>
+        <div class="grille g3" id="territoires"></div>
+        <p class="avertissement" style="margin-top: 18px;">
+          Les niveaux sont <strong>relatifs au territoire</strong> : un IRIS « vulnérabilité élevée »
+          dans la Métropole n'est pas comparable à un IRIS « vulnérabilité élevée » hors Métropole.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===== Indicateurs ===== -->
+    <section class="bloc">
+      <div class="conteneur">
+        <header class="entete-bloc">
+          <div>
+            <div class="surtitre"><span>02</span> Les indicateurs</div>
+            <h2>Cinq variables, et seulement cinq</h2>
+            <p>Toutes sont calculées à l'IRIS à partir des données de l'INSEE.</p>
+          </div>
+          <a href="classification.html">Voir la méthodologie →</a>
+        </header>
+        <div class="grille g5" id="indicateurs"></div>
+      </div>
+    </section>
+
+    <!-- ===== Méthode ===== -->
+    <section class="bloc">
+      <div class="conteneur">
+        <header>
+          <div class="surtitre"><span>03</span> Méthode</div>
+          <h2>De la donnée brute aux niveaux de vulnérabilité</h2>
+        </header>
+        <ol class="etapes" id="etapes"></ol>
+        <p style="margin-top: 20px;"><a href="classification.html">Voir les résultats détaillés →</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pied">
+    <div class="conteneur">
+      <div id="sources"></div>
+      <div>Données exportées le <span data-date-export>–</span> ·
+        Données : <a href="data/meta.json">meta.json</a>, <a href="data/classifications.json">classifications.json</a>,
+        <a href="data/iris.json">iris.json</a>, <a href="data/iris.geojson">iris.geojson</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/commun.js"></script>
+  <script src="js/accueil.js"></script>
+</body>
+</html>

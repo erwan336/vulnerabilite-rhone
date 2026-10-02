@@ -1,0 +1,220 @@
+{
+  "projet": {
+    "titre": "Vulnérabilité socio-économique des IRIS du Rhône",
+    "sous_titre": "Typologie ACP + CAH à l'IRIS - étude des inégalités sociales de santé (hépatite B)",
+    "zone_etude": "Département du Rhône (69) : Métropole de Lyon et Rhône hors Métropole",
+    "date_export": "2026-09-25",
+    "terminologie": "Niveaux de vulnérabilité (et non de risque) : décision du 25/09/2026"
+  },
+  "chiffres_cles": {
+    "n_iris": 752,
+    "n_iris_classes": 731,
+    "n_iris_sans_information": 21,
+    "n_communes_ou_arrondissements": 274,
+    "population_totale": 1903903,
+    "population_iris_classes": 1894864,
+    "n_variables": 5,
+    "n_classes": 5,
+    "n_territoires": 3,
+    "n_iris_revenu_commune": 258
+  },
+  "sources": [
+    {
+      "id": "rp2022",
+      "libelle": "INSEE, Recensement de la population 2022 - bases infracommunales IRIS (Population, Logement, Diplômes-formation, Couples-familles-ménages)"
+    },
+    {
+      "id": "filosofi2021",
+      "libelle": "INSEE, Filosofi 2021 - revenus disponibles à l'IRIS (repli : commune)"
+    },
+    {
+      "id": "ign_iris2025",
+      "libelle": "IGN, Contours IRIS 2025"
+    },
+    {
+      "id": "cog2025",
+      "libelle": "INSEE, Code officiel géographique 2025 (Métropole de Lyon / Rhône)"
+    },
+    {
+      "id": "qpv",
+      "libelle": "Quartiers prioritaires de la politique de la ville (fichier du projet, Métropole de Lyon uniquement)"
+    }
+  ],
+  "methode": {
+    "etapes": ["5 variables actives calculées à l'IRIS (pourcentages et revenu médian)", "IRIS gardés s'ils ont les 5 variables (sinon : Sans information)", "ACP normée (variables centrées-réduites sur le territoire)", "Axes retenus : max(Kaiser, inertie cumulée >= 70 %), minimum 2", "CAH de Ward sur les coordonnées factorielles, coupure en 5 classes", "Classes ordonnées selon l'axe 1 (gradient de défaveur, sens vérifié par le revenu)", "Stabilité : bootstrap (100 tirages, indice de Jaccard) ; qualité : silhouette"],
+    "echelles": "3 classifications indépendantes : département entier, Métropole seule, Rhône hors Métropole seul. Les niveaux sont relatifs au territoire et ne se comparent pas d'un territoire à l'autre.",
+    "valeurs_manquantes": "exclusion",
+    "bootstrap_tirages": 100,
+    "k_final": 5
+  },
+  "variables": [
+    {
+      "id": "revenu_med",
+      "active": true,
+      "libelle": "Revenu médian",
+      "libelle_long": "Revenu disponible médian par unité de consommation",
+      "unite": "€",
+      "decimales": 0,
+      "definition": "Médiane du revenu disponible par unité de consommation (Filosofi DISP_MED21). Si la valeur de l'IRIS n'est pas diffusée, médiane de la commune (voir revenu_source).",
+      "source": "INSEE, Filosofi 2021",
+      "sens": "Plus il est BAS, plus la vulnérabilité est forte"
+    },
+    {
+      "id": "pct_sansdip",
+      "active": true,
+      "libelle": "Sans diplôme",
+      "libelle_long": "Part des 15 ans ou plus non scolarisés sans diplôme ou au plus BEPC / brevet",
+      "unite": "%",
+      "decimales": 1,
+      "definition": "(P22_NSCOL15P_DIPLMIN + P22_NSCOL15P_BEPC) / P22_NSCOL15P : aucun diplôme ou au plus un CEP, ou BEPC / brevet des collèges / DNB, parmi les non-scolarisés de 15 ans ou plus.",
+      "source": "INSEE, RP 2022 - Diplômes-formation (IRIS)",
+      "sens": "Plus elle est HAUTE, plus la vulnérabilité est forte"
+    },
+    {
+      "id": "pct_ouvriers",
+      "active": true,
+      "libelle": "Ouvriers",
+      "libelle_long": "Part des ouvriers parmi les 15 ans ou plus",
+      "unite": "%",
+      "decimales": 1,
+      "definition": "C22_POP15P_STAT_GSEC16_26 / C22_POP15P : personnes de 15 ans ou plus ouvriers (PCS 2020) / personnes de 15 ans ou plus.",
+      "source": "INSEE, RP 2022 - Population (IRIS)",
+      "sens": "Plus elle est HAUTE, plus la vulnérabilité est forte"
+    },
+    {
+      "id": "pct_immigres",
+      "active": true,
+      "libelle": "Immigrés",
+      "libelle_long": "Part des personnes immigrées",
+      "unite": "%",
+      "decimales": 1,
+      "definition": "P22_POP_IMM / P22_POP : personnes immigrées / population.",
+      "source": "INSEE, RP 2022 - Population (IRIS)",
+      "sens": "Plus elle est HAUTE, plus la vulnérabilité est forte"
+    },
+    {
+      "id": "pct_surocc",
+      "active": true,
+      "libelle": "Suroccupation",
+      "libelle_long": "Part des résidences principales suroccupées (modérée + accentuée)",
+      "unite": "%",
+      "decimales": 1,
+      "definition": "(C22_RP_SUROCC_MOD + C22_RP_SUROCC_ACC) / total des résidences principales de la norme d'occupation : il manque au moins une pièce par rapport à la norme.",
+      "source": "INSEE, RP 2022 - Logement (IRIS, exploitation complémentaire)",
+      "sens": "Plus elle est HAUTE, plus la vulnérabilité est forte"
+    }
+  ],
+  "niveaux": [
+    {
+      "code": 1,
+      "id": "tres_faible",
+      "libelle": "Très faible",
+      "libelle_long": "Vulnérabilité très faible",
+      "profil": "Très favorisé",
+      "couleur": "#1B5E20",
+      "couleur_texte": "#FFFFFF",
+      "valeur_interne": "Risque tres faible"
+    },
+    {
+      "code": 2,
+      "id": "faible",
+      "libelle": "Faible",
+      "libelle_long": "Vulnérabilité faible",
+      "profil": "Favorisé",
+      "couleur": "#66BB6A",
+      "couleur_texte": "#212121",
+      "valeur_interne": "Risque faible"
+    },
+    {
+      "code": 3,
+      "id": "moderee",
+      "libelle": "Modérée",
+      "libelle_long": "Vulnérabilité modérée",
+      "profil": "Intermédiaire",
+      "couleur": "#FFD54F",
+      "couleur_texte": "#212121",
+      "valeur_interne": "Risque modere"
+    },
+    {
+      "code": 4,
+      "id": "elevee",
+      "libelle": "Élevée",
+      "libelle_long": "Vulnérabilité élevée",
+      "profil": "Défavorisé",
+      "couleur": "#FF8A65",
+      "couleur_texte": "#212121",
+      "valeur_interne": "Risque eleve"
+    },
+    {
+      "code": 5,
+      "id": "tres_elevee",
+      "libelle": "Très élevée",
+      "libelle_long": "Vulnérabilité très élevée",
+      "profil": "Très défavorisé",
+      "couleur": "#D32F2F",
+      "couleur_texte": "#FFFFFF",
+      "valeur_interne": "Risque tres eleve"
+    },
+    {
+      "code": 0,
+      "id": "sans_information",
+      "libelle": "Sans information",
+      "libelle_long": "Sans information (IRIS non classé)",
+      "profil": "Non classé",
+      "couleur": "#BDBDBD",
+      "couleur_texte": "#212121",
+      "valeur_interne": "Sans information"
+    }
+  ],
+  "codes_niveaux": {
+    "1..K": "niveau de vulnérabilité (1 = très faible)",
+    "0": "IRIS du territoire non classé (Sans information)",
+    "null": "IRIS hors du territoire de la classification"
+  },
+  "territoires": [
+    {
+      "id": "departement",
+      "titre": "Département du Rhône (69)",
+      "titre_court": "Département entier",
+      "zones": ["69D", "69M"],
+      "colonne_niveau": "niveau_departement",
+      "n_iris_classes": 731,
+      "n_iris_sans_information": 21,
+      "population_classee": 1894864,
+      "silhouette": 0.327,
+      "effectifs": [88, 197, 169, 169, 108]
+    },
+    {
+      "id": "metropole",
+      "titre": "Métropole de Lyon",
+      "titre_court": "Métropole",
+      "zones": ["69M"],
+      "colonne_niveau": "niveau_metropole",
+      "n_iris_classes": 493,
+      "n_iris_sans_information": 19,
+      "population_classee": 1424691,
+      "silhouette": 0.368,
+      "effectifs": [102, 100, 143, 51, 97]
+    },
+    {
+      "id": "hors_metropole",
+      "titre": "Rhône hors Métropole",
+      "titre_court": "Hors Métropole",
+      "zones": ["69D"],
+      "colonne_niveau": "niveau_hors_metropole",
+      "n_iris_classes": 238,
+      "n_iris_sans_information": 2,
+      "population_classee": 470173,
+      "silhouette": 0.356,
+      "effectifs": [72, 99, 46, 17, 4]
+    }
+  ],
+  "fichiers": {
+    "meta.json": "ce fichier",
+    "classifications.json": "résultats détaillés par territoire (ACP, CAH, classes)",
+    "iris.json": "tableau des IRIS (sans géométrie)",
+    "iris.geojson": "IRIS avec contours (carte)",
+    "limites.geojson": "limites département / Métropole / hors Métropole",
+    "qpv.geojson": "quartiers prioritaires (si disponible)"
+  }
+}

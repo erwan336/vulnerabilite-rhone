@@ -1,0 +1,15 @@
+# Fichiers presents dans le dossier mais NON utilises par les pages du site :
+# ils restent sur ton ordinateur mais ne sont pas envoyes sur GitHub / Vercel.
+# (Si une page se met a utiliser l'un d'eux, retire sa ligne ici.)
+data/QP2024_France_hexagonale_LB93.geojson
+image/sans diplome.png
+image/IMIGR*.jpg
+image/HEPATITE.jpg
+image/Lyon_1.jpg
+image/OUVRIER.jpg
+image/surrocupation.jpg
+
+# Fichiers systeme
+Thumbs.db
+desktop.ini
+.DS_Store

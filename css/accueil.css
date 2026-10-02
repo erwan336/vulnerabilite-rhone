@@ -1,0 +1,124 @@
+/* =============================================================================
+   accueil.css - page d'accueil uniquement (chargée après style.css et clair.css)
+   Le thème clair commun (couleurs, en-tête, boutons, largeur) est dans clair.css.
+   ============================================================================= */
+
+/* ---------- Héros : photo de Lyon en fond ----------
+   Voile clair à gauche pour le texte, photo nette à droite. */
+.heros {
+  padding: 72px 0 64px;
+  background:
+    linear-gradient(90deg, rgba(246, 244, 239, .97) 0%, rgba(246, 244, 239, .93) 44%, rgba(246, 244, 239, .6) 58%, rgba(246, 244, 239, 0) 74%),
+    url("../image/fond_heros_lyon.jpg") 70% 60% / cover no-repeat;
+}
+.heros-grille { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: clamp(40px, 5vw, 88px); align-items: center; }
+.kicker {
+  font-size: .85rem; color: var(--texte-3); margin: 0 0 18px;
+  padding-bottom: 10px; border-bottom: 1px solid var(--bordure); display: inline-block;
+}
+.heros h1 { font-size: clamp(1.9rem, 3.4vw, 2.7rem); line-height: 1.12; margin: 0 0 20px; max-width: 22em; }
+.heros .accroche { font-size: 1.12rem; color: var(--texte-2); max-width: 44em; margin: 0 0 30px; }
+.heros .actions { margin: 18px 0 0; font-weight: 500; }
+
+/* Recherche : champ rectangulaire, étiquette visible */
+.etiquette-recherche { display: block; font-size: .85rem; font-weight: 600; margin-bottom: 6px; }
+[data-page="accueil"] .recherche { max-width: 680px; }
+/* Carte du département */
+.heros-carte {
+  margin: 0; padding: 20px 22px 16px; border-radius: var(--rayon);
+  background: rgba(255, 255, 255, .92); box-shadow: 0 12px 32px rgba(15, 25, 45, .25);
+}
+.mini-carte { display: block; }
+.mini-carte svg { display: block; width: 100%; height: auto; max-height: 520px; }
+.mini-carte path { stroke: #fff; stroke-width: .35; }
+.mini-carte:hover path { opacity: .9; }
+.mini-carte path:hover { opacity: 1; stroke: var(--texte); stroke-width: 1; }
+.mini-carte:empty { min-height: 380px; background: var(--surface-2); border-radius: var(--rayon); }
+.heros-carte figcaption { margin-top: 14px; font-size: .85rem; color: var(--texte-3); display: grid; gap: 8px; }
+.heros-carte .legende-niveaux { color: var(--texte-2); }
+
+/* ---------- Chiffres clés ---------- */
+.bandeau-chiffres { border-top: 1px solid var(--bordure); border-bottom: 1px solid var(--bordure); background: var(--surface); }
+.bandeau-chiffres dl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; }
+.bandeau-chiffres dl > div { padding: 26px 24px; border-left: 1px solid var(--bordure); }
+.bandeau-chiffres dl > div:first-child { border-left: 0; padding-left: 0; }
+.bandeau-chiffres dt { font-family: var(--police-titres); font-size: 2.3rem; font-weight: 600; line-height: 1.1; }
+.bandeau-chiffres dd { margin: 4px 0 0; color: var(--texte-2); font-size: .9rem; }
+
+/* ---------- L'enjeu : illustration santé en fond, à droite ---------- */
+.bandeau-enjeu {
+  padding: 80px 0;
+  background:
+    /* fondu calé sur le bord gauche de l'image (collée à droite), quelle que soit la largeur d'écran */
+    linear-gradient(90deg, var(--fond) calc(100% - 560px), rgba(246, 244, 239, 0) calc(100% - 300px)),
+    url("../image/fond_panneau_sante.jpg") right center / 560px auto no-repeat,
+    var(--fond);
+  border-bottom: 1px solid var(--bordure);
+}
+.enjeu-texte { max-width: 760px; }
+.enjeu-texte h2 { font-size: clamp(1.6rem, 2.8vw, 2.2rem); }
+.enjeu-texte p { color: var(--texte-2); font-size: 1.05rem; margin: 0; }
+
+/* ---------- Sections ---------- */
+.entete-bloc { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.entete-bloc p { margin-bottom: 0; }
+.entete-bloc > a { font-weight: 500; }
+
+/* ---------- Indicateurs : photo en tête, texte en dessous ---------- */
+.indicateur {
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--surface); border: 1px solid var(--bordure); border-radius: var(--rayon);
+}
+.indicateur img { display: block; width: 100%; height: 190px; object-fit: cover; }
+.indicateur-texte { padding: 16px 18px 18px; display: flex; flex-direction: column; flex: 1; }
+.indicateur h3 { font-size: 1.15rem; margin-bottom: 6px; }
+.indicateur .unite { font-family: var(--police); font-size: .8rem; color: var(--texte-3); font-weight: 500; margin-left: 4px; }
+.indicateur .definition { color: var(--texte); font-size: .9rem; margin-bottom: 10px; }
+.indicateur .sens { color: var(--texte-2); font-size: .82rem; margin-bottom: 12px; font-style: italic; }
+.indicateur .source { margin: auto 0 0; padding-top: 10px; border-top: 1px solid var(--bordure); color: var(--texte-3); font-size: .78rem; }
+
+/* ---------- Méthode : liste numérotée sur deux colonnes ---------- */
+[data-page="accueil"] .etapes { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0 56px; }
+[data-page="accueil"] .etapes li {
+  background: none; border: 0; border-top: 1px solid var(--bordure); border-radius: 0;
+  padding: 16px 0 16px 44px;
+}
+[data-page="accueil"] .etapes li::before {
+  left: 0; top: 13px; width: auto; height: auto; display: block; background: none; border-radius: 0;
+  font-family: var(--police-titres); font-size: 1.35rem; font-weight: 600; color: var(--accent);
+}
+[data-page="accueil"] .etapes strong { display: block; font-weight: 600; }
+[data-page="accueil"] .etapes span { display: block; color: var(--texte-2); font-size: .9rem; }
+
+/* ---------- Écrans étroits ---------- */
+@media (max-width: 980px) {
+  .heros-grille { grid-template-columns: 1fr; gap: 36px; }
+  .heros-carte { max-width: 460px; }
+  .bandeau-chiffres dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bandeau-chiffres dl > div:nth-child(3) { border-left: 0; padding-left: 0; }
+  .bandeau-chiffres dl > div:nth-child(n+3) { border-top: 1px solid var(--bordure); }
+}
+@media (max-width: 980px) {
+  /* Texte au-dessus, image en dessous : voile clair plus haut et photo en bas */
+  .heros {
+    background:
+      linear-gradient(180deg, rgba(246, 244, 239, .96) 0%, rgba(246, 244, 239, .9) 45%, rgba(246, 244, 239, .2) 75%),
+      url("../image/fond_heros_lyon.jpg") 70% 100% / cover no-repeat;
+  }
+}
+@media (max-width: 700px) {
+  .bandeau-enjeu {
+    padding: 56px 0 260px;
+    background:
+      linear-gradient(180deg, var(--fond) 0%, var(--fond) 50%, rgba(246, 244, 239, 0) 72%),
+      linear-gradient(90deg, var(--fond) calc(50% - 170px), rgba(246, 244, 239, 0) calc(50% - 60px),
+                             rgba(246, 244, 239, 0) calc(50% + 60px), var(--fond) calc(50% + 170px)),
+      url("../image/fond_panneau_sante.jpg") center bottom / 320px auto no-repeat,
+      var(--fond);
+  }
+}
+@media (max-width: 560px) {
+  .heros { padding-top: 40px; }
+  .bandeau-chiffres dl > div { padding: 18px 12px; }
+  .bandeau-chiffres dt { font-size: 1.8rem; }
+}
