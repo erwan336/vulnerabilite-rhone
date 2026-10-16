@@ -457,3 +457,6 @@ select.selecteur {
 
 /* Pas de cadre de focus rectangulaire autour d'un IRIS cliqué (la sélection est déjà en blanc) */
 .leaflet-interactive:focus { outline: none; }
+
+/* Nom du projet à côté du titre, dans l'en-tête */
+.logo-projet { font-weight: 600; letter-spacing: .04em; color: var(--accent); }
