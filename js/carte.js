@@ -496,11 +496,12 @@
   // Commentaire court sous la légende, propre à chaque échelle (chiffres tirés de iris.json / classifications.json)
   const COMMENTAIRES = {
     departement:
-      "<p>Lyon et sa banlieue sont comparées au périurbain et au rural. Les 169 IRIS <b>modérés</b> sont tous dans la Métropole, " +
-      "surtout au centre (Lyon 3e, 7e, Villeurbanne).</p>" +
-      "<p><b>Effet de compensation</b> : revenus et diplômes y sont plutôt bons, mais les petits logements sont suroccupés. " +
-      "Ces deux traits s'équilibrent et placent l'IRIS au milieu.</p>" +
-      "<p><b>Effet d'échelle</b> : sur la Métropole seule, 100 de ces IRIS passent en <i>faible</i> et 44 en <i>élevée</i>.</p>",
+      "<p>Le niveau <b>élevé</b> domine l'image, surtout à l'ouest et au nord : communes rurales avec plus d'ouvriers, " +
+      "moins de diplômés et des revenus modestes.</p>" +
+      "<p><b>Effet de surface</b> : ces IRIS ruraux sont très grands. Ils couvrent 46 % de la carte mais ne regroupent " +
+      "que 18 % des habitants.</p>" +
+      "<p><b>Effet d'échelle</b> : ils sont comparés à Lyon, plus riche et plus diplômée. Classés entre eux (hors Métropole), " +
+      "87 de ces 103 IRIS ruraux redescendent en <i>modérée</i> ou <i>faible</i>.</p>",
     metropole:
       "<p>Comparés entre eux, les IRIS de la Métropole montrent des écarts plus nets. La vulnérabilité <b>très élevée</b> se " +
       "concentre à l'est et au sud (Vénissieux, Vaulx-en-Velin, Lyon 8e).</p>" +
