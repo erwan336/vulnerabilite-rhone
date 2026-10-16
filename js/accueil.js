@@ -122,4 +122,14 @@
       if (geo) dessinerMiniCarte(geo, meta);
     }).catch(function () { /* la mini-carte reste vide, le reste de la page fonctionne */ });
   }).catch(function () { /* bandeau d'erreur affiché par commun.js */ });
+
+  // ---- Partenaires : la liste est doublée pour que le défilement boucle sans saut ----
+  const piste = document.getElementById("piste-partenaires");
+  if (piste) {
+    const copie = piste.querySelector(".logos").cloneNode(true);
+    copie.setAttribute("aria-hidden", "true");
+    copie.querySelectorAll("img").forEach(function (img) { img.alt = ""; });
+    piste.appendChild(copie);
+    piste.classList.add("anime");
+  }
 })();

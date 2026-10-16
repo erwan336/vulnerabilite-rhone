@@ -122,3 +122,42 @@
   .bandeau-chiffres dl > div { padding: 18px 12px; }
   .bandeau-chiffres dt { font-size: 1.8rem; }
 }
+
+/* ---------- Pied de page : partenaires scientifiques ----------
+   Logos sur pastilles blanches ; le bandeau défile en boucle (pause au survol),
+   et reste fixe, sur plusieurs lignes, si l'utilisateur limite les animations. */
+.partenaires { min-width: 0; padding-bottom: 26px; margin-bottom: 16px; border-bottom: 1px solid var(--bordure); }
+.partenaires-entete { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 24px; flex-wrap: wrap; margin-bottom: 18px; }
+.partenaires-titre {
+  margin: 0; color: var(--accent); font-size: .78rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+}
+.partenaires-projet { margin: 0; color: var(--texte-3); font-size: .82rem; }
+.partenaires-projet strong { color: var(--texte); letter-spacing: .04em; }
+.defilement {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+.piste { display: flex; width: max-content; }
+.piste.anime { animation: partenaires-defile 38s linear infinite; }
+.defilement:hover .piste, .defilement:focus-within .piste { animation-play-state: paused; }
+@keyframes partenaires-defile { to { transform: translateX(-50%); } }
+.logos { display: flex; align-items: center; gap: 18px; margin: 0; padding: 6px 18px 10px 0; list-style: none; }
+.logos li {
+  flex: none; display: flex; align-items: center; justify-content: center; height: 92px; padding: 0 22px;
+  background: #fff; border: 1px solid var(--bordure); border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(30, 30, 28, .05);
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.logos li:hover { transform: translateY(-4px); border-color: var(--bordure-2); box-shadow: 0 10px 24px rgba(30, 30, 28, .12); }
+.logos img { display: block; width: auto; height: auto; max-height: 64px; max-width: 200px; }
+@media (prefers-reduced-motion: reduce) {
+  .defilement { -webkit-mask-image: none; mask-image: none; }
+  .piste.anime { animation: none; width: auto; }
+  .piste .logos { flex-wrap: wrap; padding-right: 0; }
+  .piste .logos[aria-hidden] { display: none; }
+}
+@media (max-width: 560px) {
+  .logos li { height: 72px; padding: 0 14px; }
+  .logos img { max-height: 48px; max-width: 150px; }
+}
