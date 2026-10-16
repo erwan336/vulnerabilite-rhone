@@ -388,9 +388,15 @@ body.page-carte { height: 100vh; overflow: hidden; display: flex; flex-direction
   background: var(--accent-doux); border-left: 3px solid var(--accent);
   font-size: .78rem; line-height: 1.45; color: var(--texte-2);
 }
-.legende-commentaire h3 { margin: 0 0 6px; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--texte); }
+.legende-commentaire[hidden] { display: none; }
 .legende-commentaire p { margin: 0 0 6px; }
-.legende-commentaire p:last-child { margin-bottom: 0; }
+.legende-commentaire .lien-methode { display: inline-block; margin-top: 2px; font-weight: 600; }
+button.legende-bouton {
+  display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%;
+  background: none; font: 600 .85rem var(--police); cursor: pointer;
+}
+button.legende-bouton .chevron { transition: transform .2s; color: var(--texte-2); }
+button.legende-bouton[aria-expanded="true"] .chevron { transform: rotate(180deg); }
 .legende-commentaire b { color: var(--texte); font-weight: 600; }
 
 .options label { display: flex; align-items: center; gap: 10px; font-size: .9rem; padding: 4px 0; cursor: pointer; }

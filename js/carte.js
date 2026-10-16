@@ -513,6 +513,8 @@
       "<p><b>Effet d'échelle</b> : ces 46 IRIS modérés sont classés <i>élevée</i> à l'échelle du département.</p>"
   };
 
+  let commentaireOuvert = false;
+
   function construireLegende(comptes, pops) {
     const corps = document.getElementById("legende-corps");
     const terr = META.territoires.find(function (t) { return t.id === TERR; }) || {};
@@ -538,8 +540,19 @@
         "<dt>Méthode</dt><dd>ACP + CAH (Ward)</dd>" +
         "<dt>Données</dt><dd>RP 2022 · Filosofi 2021</dd>" +
         "<dt>Silhouette</dt><dd>" + S.nombre(terr.silhouette, 2) + "</dd></dl>" +
-      '<a class="legende-bouton" href="classification.html#' + TERR + '">En savoir plus</a>' +
-      (COMMENTAIRES[TERR] ? '<div class="legende-commentaire"><h3>Lecture de la carte</h3>' + COMMENTAIRES[TERR] + "</div>" : "");
+      '<button type="button" class="legende-bouton" id="bouton-commentaire" aria-expanded="' + commentaireOuvert +
+        '" aria-controls="legende-commentaire">Comment lire cette carte ?<svg class="chevron" width="14" height="14" viewBox="0 0 24 24" ' +
+        'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>' +
+      '<div class="legende-commentaire" id="legende-commentaire"' + (commentaireOuvert ? "" : " hidden") + ">" +
+        (COMMENTAIRES[TERR] || "") +
+        '<a class="lien-methode" href="classification.html#' + TERR + '">Méthode détaillée →</a></div>';
+
+    // Commentaire masqué par défaut ; l'état ouvert/fermé est gardé quand on change de territoire
+    corps.querySelector("#bouton-commentaire").addEventListener("click", function () {
+      commentaireOuvert = !commentaireOuvert;
+      this.setAttribute("aria-expanded", commentaireOuvert);
+      corps.querySelector("#legende-commentaire").hidden = !commentaireOuvert;
+    });
 
     corps.querySelectorAll("input").forEach(function (cb) {
       cb.addEventListener("change", function () { visibles[cb.dataset.code] = cb.checked; appliquer(); });
