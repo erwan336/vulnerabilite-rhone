@@ -382,6 +382,16 @@ body.page-carte { height: 100vh; overflow: hidden; display: flex; flex-direction
 }
 .legende-bouton:hover { background: var(--surface-2); text-decoration: none; }
 .leaflet-top.leaflet-right .legende-flottante { margin: 14px 14px 0 0; }
+/* Commentaire de lecture, propre à l'échelle choisie */
+.legende-commentaire {
+  margin-top: 14px; padding: 10px 12px; border-radius: var(--rayon-s);
+  background: var(--accent-doux); border-left: 3px solid var(--accent);
+  font-size: .78rem; line-height: 1.45; color: var(--texte-2);
+}
+.legende-commentaire h3 { margin: 0 0 6px; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--texte); }
+.legende-commentaire p { margin: 0 0 6px; }
+.legende-commentaire p:last-child { margin-bottom: 0; }
+.legende-commentaire b { color: var(--texte); font-weight: 600; }
 
 .options label { display: flex; align-items: center; gap: 10px; font-size: .9rem; padding: 4px 0; cursor: pointer; }
 .options .trait { width: 26px; display: inline-block; border-top-width: 3px; }

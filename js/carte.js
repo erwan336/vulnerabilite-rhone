@@ -493,6 +493,26 @@
     ctrl.addTo(map);
   }
 
+  // Commentaire court sous la légende, propre à chaque échelle (chiffres tirés de iris.json / classifications.json)
+  const COMMENTAIRES = {
+    departement:
+      "<p>Lyon et sa banlieue sont comparées au périurbain et au rural. Les 169 IRIS <b>modérés</b> sont tous dans la Métropole, " +
+      "surtout au centre (Lyon 3e, 7e, Villeurbanne).</p>" +
+      "<p><b>Effet de compensation</b> : revenus et diplômes y sont plutôt bons, mais les petits logements sont suroccupés. " +
+      "Ces deux traits s'équilibrent et placent l'IRIS au milieu.</p>" +
+      "<p><b>Effet d'échelle</b> : sur la Métropole seule, 100 de ces IRIS passent en <i>faible</i> et 44 en <i>élevée</i>.</p>",
+    metropole:
+      "<p>Comparés entre eux, les IRIS de la Métropole montrent des écarts plus nets. La vulnérabilité <b>très élevée</b> se " +
+      "concentre à l'est et au sud (Vénissieux, Vaulx-en-Velin, Lyon 8e).</p>" +
+      "<p>Le centre dense (Lyon 1er, 3e, 7e) ressort en <b>élevée</b> à cause de la suroccupation. " +
+      "La première couronne (Villeurbanne, Saint-Priest, Décines) forme le profil <b>modéré</b>.</p>",
+    hors_metropole:
+      "<p>Territoire plutôt favorisé : 3 habitants sur 4 vivent dans un IRIS de vulnérabilité faible ou très faible.</p>" +
+      "<p>Le niveau <b>modéré</b> correspond aux bourgs ouvriers du Beaujolais (Amplepuis, Belleville). La vulnérabilité " +
+      "<b>élevée</b> se concentre à Villefranche-sur-Saône et Tarare.</p>" +
+      "<p><b>Effet d'échelle</b> : ces 46 IRIS modérés sont classés <i>élevée</i> à l'échelle du département.</p>"
+  };
+
   function construireLegende(comptes, pops) {
     const corps = document.getElementById("legende-corps");
     const terr = META.territoires.find(function (t) { return t.id === TERR; }) || {};
@@ -518,7 +538,8 @@
         "<dt>Méthode</dt><dd>ACP + CAH (Ward)</dd>" +
         "<dt>Données</dt><dd>RP 2022 · Filosofi 2021</dd>" +
         "<dt>Silhouette</dt><dd>" + S.nombre(terr.silhouette, 2) + "</dd></dl>" +
-      '<a class="legende-bouton" href="classification.html#' + TERR + '">En savoir plus</a>';
+      '<a class="legende-bouton" href="classification.html#' + TERR + '">En savoir plus</a>' +
+      (COMMENTAIRES[TERR] ? '<div class="legende-commentaire"><h3>Lecture de la carte</h3>' + COMMENTAIRES[TERR] + "</div>" : "");
 
     corps.querySelectorAll("input").forEach(function (cb) {
       cb.addEventListener("change", function () { visibles[cb.dataset.code] = cb.checked; appliquer(); });
