@@ -13,7 +13,8 @@
     irisGeo:         "data/iris.geojson",
     limites:         "data/limites.geojson",
     qpv:             "data/qpv.geojson",
-    qpv2024:         "data/qpv2024_rhone.geojson"   // QPV 2024 (ANCT), tout le département
+    qpv2024:         "data/qpv2024_rhone.geojson",  // QPV 2024 (ANCT), tout le département
+    actions:         "data/actions.geojson"         // lieux d'action 2022-2024 (fichier prévisionnel)
   };
   const cache = {};
 

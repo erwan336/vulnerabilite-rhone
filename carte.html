@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Carte - Typologie socio-économique des IRIS du Rhône</title>
+  <meta name="description" content="Carte interactive de la vulnérabilité socio-économique des IRIS du Rhône et de Lyon : revenus, diplômes, ouvriers, immigrés, suroccupation des logements.">
+  <link rel="canonical" href="https://vulnerabilite-rhone.erwangeo.com/carte.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:title" content="Carte - Typologie socio-économique des IRIS du Rhône">
+  <meta property="og:description" content="Carte interactive de la vulnérabilité socio-économique des IRIS du Rhône et de Lyon : revenus, diplômes, ouvriers, immigrés, suroccupation des logements.">
+  <meta property="og:url" content="https://vulnerabilite-rhone.erwangeo.com/carte.html">
+  <meta property="og:image" content="https://vulnerabilite-rhone.erwangeo.com/image/fond_heros_lyon.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
@@ -56,6 +64,27 @@
       <div class="groupe" id="fiche-groupe">
         <h2>IRIS sélectionné</h2>
         <div class="fiche" id="fiche"><p class="tres-discret">Cliquez sur un IRIS de la carte.</p></div>
+      </div>
+
+      <div class="groupe options" id="groupe-actions" hidden>
+        <h2>Actions de prévention</h2>
+        <div class="commutateur" id="actions-annee" role="group" aria-label="Année des actions">
+          <button type="button" data-annee="2022" aria-pressed="false">2022</button>
+          <button type="button" data-annee="2023" aria-pressed="false">2023</button>
+          <button type="button" data-annee="2024" aria-pressed="true">2024</button>
+          <button type="button" data-annee="tout" aria-pressed="false">2022-2024</button>
+        </div>
+        <label><input type="checkbox" id="actions-carte">
+          <span class="bulle-exemple"></span> Afficher sur la carte</label>
+        <div id="bloc-actions" hidden>
+          <div class="legende-bulles" id="legende-actions"></div>
+          <div class="legende-types" id="legende-types" hidden></div>
+          <p class="tres-discret aide-actions" id="aide-lieux">Zoomez sur un quartier pour voir chaque lieu.</p>
+        </div>
+        <details class="top-actions-details">
+          <summary id="titre-top"></summary>
+          <ol class="top-actions" id="top-actions"></ol>
+        </details>
       </div>
 
       <div class="groupe options">

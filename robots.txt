@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vulnerabilite-rhone.erwangeo.com/sitemap.xml

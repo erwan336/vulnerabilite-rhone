@@ -13,3 +13,6 @@ image/surrocupation.jpg
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Données brutes (non publiées)
+*.xlsx

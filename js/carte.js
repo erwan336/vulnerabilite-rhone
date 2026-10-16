@@ -57,10 +57,12 @@
   /* ---------- État ---------- */
   let DONNEES, META, NIV, CLASSIF, TERR = "departement", groupeIris = null, limites = null, qpv = null, selection = null;
   const calques = {};          // code_iris -> calque Leaflet
+  let survole = null;          // IRIS sous la souris
   const visibles = {};         // code de niveau -> true/false
   const stats = {};            // territoire -> variable -> {tri, min, max, med}
 
-  S.chargerTout(["meta", "classifications", "iris", "irisGeo", "limites", "qpv", "qpv2024"], ["qpv", "qpv2024"]).then(function (d) {
+  S.chargerTout(["meta", "classifications", "iris", "irisGeo", "limites", "qpv", "qpv2024", "actions"],
+                ["qpv", "qpv2024", "actions"]).then(function (d) {
     DONNEES = d;
     META = d.meta; NIV = S.niveauxParCode(META); CLASSIF = d.classifications;
     META.niveaux.forEach(function (n) { visibles[n.code] = true; });
@@ -85,6 +87,9 @@
         // Pas de surbrillance ni de bringToFront pendant un glisser : déplacer le <path> sous la souris
         // fait perdre le relâchement du bouton, et la carte continue de suivre le curseur.
         l.on("mouseover", function (e) {
+          // Une seule infobulle d'IRIS à la fois (bringToFront peut faire perdre un mouseout)
+          if (survole && survole !== l) { survole.closeTooltip(); survole.setStyle(styleIris(survole.feature)); }
+          survole = l;
           if (map.dragging.moving() || (e.originalEvent && e.originalEvent.buttons)) return;
           if (l !== selection) l.setStyle({ weight: 2, color: "#FFFFFF" });
           l.bringToFront();
@@ -138,6 +143,8 @@
       document.getElementById("option-qpv").hidden = true;
     }
 
+    if (d.actions) initialiserActions(d.actions);
+
     document.getElementById("fond").addEventListener("change", function (e) { changerFond(e.target.value); });
     changerFond("sombre");
     appliquer();
@@ -165,6 +172,171 @@
       basculerPanneau(!document.getElementById("panneau").classList.contains("ouvert"));
     });
   }).catch(function () {});
+
+  /* ---------- Actions de prévention 2022-2024 (data/actions.geojson) ----------
+     Sémiologie propre aux actions (distincte des aplats d'IRIS et des contours QPV/limites) :
+     une bulle « verre » par IRIS, de surface proportionnelle au nombre d'actions, posée au centre
+     des lieux d'action. De près, les bulles laissent place aux lieux eux-mêmes, colorés par type.
+     Rien n'est affiché au départ. */
+  const COULEURS_TYPES = {
+    "Hébergement et accueil": "#3B82F6", "Associatif et communautaire": "#8B5CF6", "Festif": "#EC4899",
+    "Soins et santé": "#14B8A6", "Commerce et vie quotidienne": "#F59E0B", "Spécifique": "#94A3B8"
+  };
+  const SEUIL_LIEUX = 14.5;    // zoom à partir duquel les lieux remplacent les bulles
+  let ACTIONS = null, anneeActions = "2024", coucheBulles = null, coucheLieux = null, groupesActions = [];
+  const actionsParIris = {};   // code IRIS -> { "2022": n, "2023": n, "2024": n }
+
+  /** Rayon (px) d'une bulle : surface proportionnelle au nombre d'actions, atténuée quand on dézoome. */
+  function rayonBulle(n, zoom) {
+    const k = zoom == null ? 1 : Math.max(0.55, Math.min(1.15, 0.55 + (zoom - 10) * 0.15));
+    return (2.5 + 3.4 * Math.sqrt(n)) * k;
+  }
+
+  function initialiserActions(geo) {
+    ACTIONS = geo.features;
+    ACTIONS.forEach(function (f) {
+      const p = f.properties;
+      const a = actionsParIris[p.code_iris] = actionsParIris[p.code_iris] || {};
+      a[p.annee] = (a[p.annee] || 0) + 1;
+    });
+    map.createPane("actions").style.zIndex = 610;            // au-dessus des IRIS, des QPV et des limites
+    document.getElementById("groupe-actions").hidden = false;
+    document.getElementById("legende-types").innerHTML = Object.keys(COULEURS_TYPES).map(function (t) {
+      return '<span><i style="background:' + COULEURS_TYPES[t] + '"></i>' + S.echapper(t) + "</span>";
+    }).join("");
+    document.querySelectorAll("#actions-annee button").forEach(function (b) {
+      b.addEventListener("click", function () { anneeActions = b.dataset.annee; dessinerActions(); });
+    });
+    document.getElementById("actions-carte").addEventListener("change", dessinerActions);
+    map.on("zoomend", afficherSelonZoom);
+    dessinerActions();
+  }
+
+  /** De loin : bulles par IRIS ; de près : lieux par type. */
+  function afficherSelonZoom() {
+    if (!ACTIONS) return;
+    const actif = document.getElementById("actions-carte").checked;
+    const proche = map.getZoom() >= SEUIL_LIEUX;
+    if (coucheBulles) map.removeLayer(coucheBulles);
+    coucheBulles = null;
+    if (actif && !proche) coucheBulles = construireBulles().addTo(map);
+    if (coucheLieux) { if (actif && proche) coucheLieux.addTo(map); else map.removeLayer(coucheLieux); }
+    document.getElementById("bloc-actions").hidden = !actif;
+    document.getElementById("legende-actions").hidden = proche;
+    document.getElementById("legende-types").hidden = !proche;
+    document.getElementById("aide-lieux").hidden = proche;
+  }
+
+  function construireBulles() {
+    const zoom = map.getZoom();
+    const libAnnee = anneeActions === "tout" ? "en 2022-2024" : "en " + anneeActions;
+    // Les plus grosses d'abord : les petites restent visibles par-dessus
+    return L.layerGroup(groupesActions.slice().sort(function (a, b) { return b.n - a.n; }).map(function (g, i) {
+      const d = Math.round(rayonBulle(g.n, zoom) * 2);
+      const m = L.marker([g.lat, g.lng], {
+        pane: "actions", zIndexOffset: i, keyboard: false,
+        icon: L.divIcon({
+          className: "bulle-action", iconSize: [d, d],
+          html: "<span>" + (d >= 22 ? g.n : "") + "</span>"
+        })
+      });
+      m.bindTooltip(function () {
+        return "<strong>" + S.echapper(g.nom) + "</strong><br>" + S.echapper(g.commune) +
+          "<br><br><strong>" + g.n + " action" + (g.n > 1 ? "s" : "") + " " + libAnnee + "</strong>" +
+          (g.h ? " · " + S.nombre(g.h) + " h" : "") + "<br>" +
+          Object.keys(g.types).sort(function (a, b) { return g.types[b] - g.types[a]; })
+            .map(function (t) {
+              return '<i class="pastille" style="background:' + (COULEURS_TYPES[t] || "#94A3B8") + '"></i>' +
+                S.echapper(t) + " : " + g.types[t];
+            }).join("<br>");
+      }, { className: "etiquette-iris", direction: "top", offset: [0, -d / 2] });
+      m.on("click", function () { selectionner(g.code, false); });
+      return m;
+    }));
+  }
+
+  /** Légende en cercles emboîtés (1, un tiers du maximum, maximum). */
+  function legendeBulles(max) {
+    const valeurs = [1, Math.max(2, Math.round(max / 3)), max].filter(function (v, i, t) { return t.indexOf(v) === i; });
+    // Agrandie pour rester lisible, même quand le maximum est faible (une seule année)
+    const echelle = Math.max(1.7, 30 / rayonBulle(max));
+    const rayon = function (v) { return rayonBulle(v) * echelle; };
+    const R = rayon(max), H = Math.ceil(R * 2) + 8, base = H - 2, cx = R + 2;
+    // Étiquettes du haut vers le bas, écartées d'au moins 14 px
+    let yTexte = -Infinity;
+    const cercles = valeurs.slice().reverse().map(function (v) {
+      const r = rayon(v), y = base - 2 * r;
+      yTexte = Math.max(y + 4, yTexte + 14);
+      return '<circle cx="' + cx + '" cy="' + (base - r) + '" r="' + r + '"/>' +
+        '<polyline points="' + cx + "," + y + " " + (2 * R + 8) + "," + y + " " + (2 * R + 14) + "," + (yTexte - 4) + '"/>' +
+        '<text x="' + (2 * R + 18) + '" y="' + yTexte + '">' + v + "</text>";
+    }).join("");
+    return '<svg width="' + Math.ceil(2 * R + 40) + '" height="' + Math.ceil(Math.max(H, yTexte + 4)) + '" aria-hidden="true">' + cercles + "</svg>" +
+      "<span>Nombre d'actions par IRIS<small>Surface proportionnelle</small></span>";
+  }
+
+  function dessinerActions() {
+    const annee = anneeActions, tout = annee === "tout";
+    const libAnnee = tout ? "en 2022-2024" : "en " + annee;
+    document.querySelectorAll("#actions-annee button").forEach(function (b) {
+      b.setAttribute("aria-pressed", b.dataset.annee === annee);
+    });
+    // Actions de l'année choisie, limitées au territoire affiché (Métropole, hors Métropole…)
+    const choisies = ACTIONS.filter(function (f) {
+      const l = calques[f.properties.code_iris];
+      return (tout || f.properties.annee === annee) && l && codeNiveau(l.feature.properties) != null;
+    });
+
+    // Regroupement par IRIS : nombre, heures, types, centre des lieux
+    const groupes = {};
+    choisies.forEach(function (f) {
+      const p = f.properties, c = f.geometry.coordinates;
+      const g = groupes[p.code_iris] = groupes[p.code_iris] ||
+        { code: p.code_iris, nom: p.nom_iris, commune: p.commune, n: 0, h: 0, types: {}, lat: 0, lng: 0 };
+      g.n++; g.h += p.heures || 0;
+      g.lat += c[1]; g.lng += c[0];
+      g.types[p.categorie] = (g.types[p.categorie] || 0) + 1;
+    });
+    groupesActions = Object.values(groupes).map(function (g) { g.lat /= g.n; g.lng /= g.n; return g; })
+      .sort(function (a, b) { return b.n - a.n || b.h - a.h; });
+
+    const max = groupesActions.length ? groupesActions[0].n : 1;
+    document.getElementById("legende-actions").innerHTML = legendeBulles(max);
+
+    // Lieux d'action, colorés par type (à l'échelle de la rue)
+    if (coucheLieux) map.removeLayer(coucheLieux);
+    coucheLieux = L.layerGroup(choisies.map(function (f) {
+      const p = f.properties, c = f.geometry.coordinates;
+      return L.circleMarker([c[1], c[0]], {
+        pane: "actions", radius: 5, weight: 1.5, color: "#FFFFFF", fillOpacity: 0.95,
+        fillColor: COULEURS_TYPES[p.categorie] || "#94A3B8"
+      }).bindTooltip("<strong>" + S.echapper(p.nom) + "</strong><br>" + S.echapper(p.type) + " · " + S.echapper(p.association) +
+        "<br>" + p.annee + (p.frequence ? " · " + S.echapper(p.frequence) : "") + (p.heures ? " · " + S.nombre(p.heures) + " h/an" : "") +
+        (p.publics ? "<br>Publics : " + S.echapper(p.publics) : "") +
+        (p.approx ? "<br><em>Position approximative (centre de l'IRIS)</em>" : ""), { className: "etiquette-iris" });
+    }));
+    afficherSelonZoom();
+
+    // Les IRIS avec le plus d'actions (repliés par défaut)
+    document.getElementById("titre-top").innerHTML = "IRIS les plus actifs " + libAnnee +
+      " <small>" + choisies.length + " actions · " + groupesActions.length + " IRIS</small>";
+    const top = document.getElementById("top-actions");
+    top.innerHTML = groupesActions.slice(0, 6).map(function (g) {
+      return '<li><button type="button" data-code="' + g.code + '"><span>' + S.echapper(g.nom) +
+        "<small>" + S.echapper(g.commune) + "</small></span><strong>" + g.n + "</strong></button></li>";
+    }).join("");
+    top.querySelectorAll("button").forEach(function (b) {
+      b.addEventListener("click", function () { selectionner(b.dataset.code, true); });
+    });
+  }
+
+  function blocActionsFiche(code) {
+    if (!ACTIONS) return "";
+    const a = actionsParIris[code] || {};
+    const total = (a["2022"] || 0) + (a["2023"] || 0) + (a["2024"] || 0);
+    return '<div class="variable"><div class="haut"><span>Actions de prévention</span><strong>' + total + " en 3 ans</strong></div>" +
+      '<div class="note">2022 : ' + (a["2022"] || 0) + " · 2023 : " + (a["2023"] || 0) + " · 2024 : " + (a["2024"] || 0) + "</div></div>";
+  }
 
   /* ---------- Vue 3D (MapLibre, voir carte3d.js) ---------- */
   function cadrer(b, zoomMax, marge) {
@@ -272,6 +444,7 @@
     });
     if (selection) afficherFiche(selection.feature.properties);
     if (mode3D) Carte3D.maj();
+    if (ACTIONS) dessinerActions();          // les actions suivent le territoire affiché
   }
 
   function construireChoixTerritoire() {
@@ -429,7 +602,7 @@
       S.echapper(TYPES_IRIS[p.type_iris] || p.type_iris) + " · " + S.nombre(p.population) + " hab.</div>" +
       lignesNiveaux +
       (p.motif_non_classe ? '<p class="note" style="color:#FDE68A">' + S.echapper(p.motif_non_classe) + "</p>" : "") +
-      variables +
+      variables + blocActionsFiche(p.code_iris) +
       '<p class="note" style="margin-top:10px">Jauge : position entre le minimum et le maximum des IRIS classés du territoire affiché.</p>';
     if (window.innerWidth <= 860) basculerPanneau(true);
   }
