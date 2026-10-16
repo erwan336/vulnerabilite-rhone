@@ -41,6 +41,27 @@
   paneLimites.style.pointerEvents = "none";
   L.control.scale({ imperial: false, position: "bottomright" }).addTo(map);
 
+  /* Une seule infobulle pour toute la carte (IRIS, QPV, bulles, lieux) : quand la souris passe vite
+     d'une forme à l'autre, l'ancienne est remplacée au lieu de rester affichée par-dessus. */
+  const infobulle = L.tooltip({ className: "etiquette-iris", direction: "top", opacity: 1 });
+  let sourceInfobulle = null;
+  function fermerInfobulle() { sourceInfobulle = null; map.closeTooltip(infobulle); }
+  /** contenu : texte ou fonction ; decalage : [x, y] (par défaut au-dessus du curseur) ; fixe : ancrée sur le symbole. */
+  function infobulleSur(couche, contenu, decalage, fixe) {
+    couche.on("mouseover mousemove", function (e) {
+      if (map.dragging.moving() || (e.originalEvent && e.originalEvent.buttons)) return;
+      if (sourceInfobulle !== couche) {
+        sourceInfobulle = couche;
+        infobulle.options.offset = decalage || [0, -8];
+        infobulle.setContent(typeof contenu === "function" ? contenu() : contenu);
+      }
+      infobulle.setLatLng(fixe && couche.getLatLng ? couche.getLatLng() : e.latlng);
+      if (!map.hasLayer(infobulle)) map.openTooltip(infobulle);
+    });
+    couche.on("mouseout remove", function () { if (sourceInfobulle === couche) fermerInfobulle(); });
+  }
+  map.on("mouseout dragstart zoomstart", fermerInfobulle);
+
   let fondActif = null, nomFond = "sombre", mode3D = false;
   function changerFond(nom) {
     if (nom === "3d") { activer3D(); return; }
@@ -82,13 +103,12 @@
       style: styleIris,
       onEachFeature: function (f, l) {
         calques[f.properties.code_iris] = l;
-        l.bindTooltip(function () { return etiquette(f.properties); },
-          { sticky: true, className: "etiquette-iris", direction: "top", offset: [0, -8] });
+        infobulleSur(l, function () { return etiquette(f.properties); });
         // Pas de surbrillance ni de bringToFront pendant un glisser : déplacer le <path> sous la souris
         // fait perdre le relâchement du bouton, et la carte continue de suivre le curseur.
         l.on("mouseover", function (e) {
-          // Une seule infobulle d'IRIS à la fois (bringToFront peut faire perdre un mouseout)
-          if (survole && survole !== l) { survole.closeTooltip(); survole.setStyle(styleIris(survole.feature)); }
+          // Une seule surbrillance à la fois (bringToFront peut faire perdre un mouseout)
+          if (survole && survole !== l) survole.setStyle(styleIris(survole.feature));
           survole = l;
           if (map.dragging.moving() || (e.originalEvent && e.originalEvent.buttons)) return;
           if (l !== selection) l.setStyle({ weight: 2, color: "#FFFFFF" });
@@ -116,8 +136,7 @@
         pane: "qpv",
         style: { color: "#F472B6", weight: 2.5, dashArray: "6 4", fill: false, opacity: 1 },
         onEachFeature: function (f, l) {
-          l.bindTooltip("QPV 2024 : " + S.echapper(f.properties.nom) + "<br>" + S.echapper(f.properties.commune),
-            { sticky: true, className: "etiquette-iris" });
+          infobulleSur(l, "QPV 2024 : " + S.echapper(f.properties.nom) + "<br>" + S.echapper(f.properties.commune));
         }
       }).addTo(map);
       document.getElementById("couche-qpv2024").addEventListener("change", function (e) {
@@ -133,7 +152,7 @@
         pane: "qpv",
         style: { color: "#38BDF8", weight: 2, fill: false, opacity: 0.95 },
         onEachFeature: function (f, l) {
-          l.bindTooltip("QPV : " + S.echapper(f.properties.nom), { sticky: true, className: "etiquette-iris" });
+          infobulleSur(l, "QPV : " + S.echapper(f.properties.nom));
         }
       }).addTo(map);
       document.getElementById("couche-qpv").addEventListener("change", function (e) {
@@ -240,7 +259,7 @@
           html: "<span>" + (d >= 22 ? g.n : "") + "</span>"
         })
       });
-      m.bindTooltip(function () {
+      infobulleSur(m, function () {
         return "<strong>" + S.echapper(g.nom) + "</strong><br>" + S.echapper(g.commune) +
           "<br><br><strong>" + g.n + " action" + (g.n > 1 ? "s" : "") + " " + libAnnee + "</strong>" +
           (g.h ? " · " + S.nombre(g.h) + " h" : "") + "<br>" +
@@ -249,7 +268,7 @@
               return '<i class="pastille" style="background:' + (COULEURS_TYPES[t] || "#94A3B8") + '"></i>' +
                 S.echapper(t) + " : " + g.types[t];
             }).join("<br>");
-      }, { className: "etiquette-iris", direction: "top", offset: [0, -d / 2] });
+      }, [0, -d / 2 - 4], true);
       m.on("click", function () { selectionner(g.code, false); });
       return m;
     }));
@@ -307,13 +326,15 @@
     if (coucheLieux) map.removeLayer(coucheLieux);
     coucheLieux = L.layerGroup(choisies.map(function (f) {
       const p = f.properties, c = f.geometry.coordinates;
-      return L.circleMarker([c[1], c[0]], {
+      const point = L.circleMarker([c[1], c[0]], {
         pane: "actions", radius: 5, weight: 1.5, color: "#FFFFFF", fillOpacity: 0.95,
         fillColor: COULEURS_TYPES[p.categorie] || "#94A3B8"
-      }).bindTooltip("<strong>" + S.echapper(p.nom) + "</strong><br>" + S.echapper(p.type) + " · " + S.echapper(p.association) +
+      });
+      infobulleSur(point, "<strong>" + S.echapper(p.nom) + "</strong><br>" + S.echapper(p.type) + " · " + S.echapper(p.association) +
         "<br>" + p.annee + (p.frequence ? " · " + S.echapper(p.frequence) : "") + (p.heures ? " · " + S.nombre(p.heures) + " h/an" : "") +
         (p.publics ? "<br>Publics : " + S.echapper(p.publics) : "") +
-        (p.approx ? "<br><em>Position approximative (centre de l'IRIS)</em>" : ""), { className: "etiquette-iris" });
+        (p.approx ? "<br><em>Position approximative (centre de l'IRIS)</em>" : ""), [0, -10], true);
+      return point;
     }));
     afficherSelonZoom();
 
