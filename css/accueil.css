@@ -8,7 +8,7 @@
 .heros {
   padding: 72px 0 64px;
   background:
-    linear-gradient(90deg, rgba(246, 244, 239, .97) 0%, rgba(246, 244, 239, .93) 44%, rgba(246, 244, 239, .6) 58%, rgba(246, 244, 239, 0) 74%),
+    linear-gradient(90deg, rgba(255, 255, 255, .97) 0%, rgba(255, 255, 255, .93) 44%, rgba(255, 255, 255, .6) 58%, rgba(255, 255, 255, 0) 74%),
     url("../image/fond_heros_lyon.jpg") 70% 60% / cover no-repeat;
 }
 .heros-grille { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: clamp(40px, 5vw, 88px); align-items: center; }
@@ -50,7 +50,7 @@
   padding: 80px 0;
   background:
     /* fondu calé sur le bord gauche de l'image (collée à droite), quelle que soit la largeur d'écran */
-    linear-gradient(90deg, var(--fond) calc(100% - 560px), rgba(246, 244, 239, 0) calc(100% - 300px)),
+    linear-gradient(90deg, var(--fond) calc(100% - 560px), rgba(255, 255, 255, 0) calc(100% - 300px)),
     url("../image/fond_panneau_sante.jpg") right center / 560px auto no-repeat,
     var(--fond);
   border-bottom: 1px solid var(--bordure);
@@ -102,7 +102,7 @@
   /* Texte au-dessus, image en dessous : voile clair plus haut et photo en bas */
   .heros {
     background:
-      linear-gradient(180deg, rgba(246, 244, 239, .96) 0%, rgba(246, 244, 239, .9) 45%, rgba(246, 244, 239, .2) 75%),
+      linear-gradient(180deg, rgba(255, 255, 255, .96) 0%, rgba(255, 255, 255, .9) 45%, rgba(255, 255, 255, .2) 75%),
       url("../image/fond_heros_lyon.jpg") 70% 100% / cover no-repeat;
   }
 }
@@ -110,9 +110,9 @@
   .bandeau-enjeu {
     padding: 56px 0 260px;
     background:
-      linear-gradient(180deg, var(--fond) 0%, var(--fond) 50%, rgba(246, 244, 239, 0) 72%),
-      linear-gradient(90deg, var(--fond) calc(50% - 170px), rgba(246, 244, 239, 0) calc(50% - 60px),
-                             rgba(246, 244, 239, 0) calc(50% + 60px), var(--fond) calc(50% + 170px)),
+      linear-gradient(180deg, var(--fond) 0%, var(--fond) 50%, rgba(255, 255, 255, 0) 72%),
+      linear-gradient(90deg, var(--fond) calc(50% - 170px), rgba(255, 255, 255, 0) calc(50% - 60px),
+                             rgba(255, 255, 255, 0) calc(50% + 60px), var(--fond) calc(50% + 170px)),
       url("../image/fond_panneau_sante.jpg") center bottom / 320px auto no-repeat,
       var(--fond);
   }
@@ -146,10 +146,10 @@
 .logos li {
   flex: none; display: flex; align-items: center; justify-content: center; height: 92px; padding: 0 22px;
   background: #fff; border: 1px solid var(--bordure); border-radius: 10px;
-  box-shadow: 0 1px 2px rgba(30, 30, 28, .05);
+  box-shadow: 0 1px 2px rgba(17, 24, 39, .05);
   transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
 }
-.logos li:hover { transform: translateY(-4px); border-color: var(--bordure-2); box-shadow: 0 10px 24px rgba(30, 30, 28, .12); }
+.logos li:hover { transform: translateY(-4px); border-color: var(--bordure-2); box-shadow: 0 10px 24px rgba(17, 24, 39, .12); }
 .logos img { display: block; width: auto; height: auto; max-height: 64px; max-width: 200px; }
 @media (prefers-reduced-motion: reduce) {
   .defilement { -webkit-mask-image: none; mask-image: none; }

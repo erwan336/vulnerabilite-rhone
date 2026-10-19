@@ -5,15 +5,15 @@
    ============================================================================= */
 
 .theme-clair {
-  --fond:        #F6F4EF;
+  --fond:        #FFFFFF;
   --surface:     #FFFFFF;
-  --surface-2:   #EFECE5;
-  --surface-3:   #E5E0D6;
-  --bordure:     #E0DBD0;
-  --bordure-2:   #C9C2B4;
-  --texte:       #1E1E1C;
-  --texte-2:     #57534C;
-  --texte-3:     #86817A;
+  --surface-2:   #F4F6F9;
+  --surface-3:   #E8ECF1;
+  --bordure:     #E4E8EE;
+  --bordure-2:   #CDD4DE;
+  --texte:       #161B22;
+  --texte-2:     #4B5563;
+  --texte-3:     #6B7280;
   --accent:      #1F4E79;
   --accent-fort: #1F4E79;
   --accent-doux: rgba(31, 78, 121, .10);
@@ -30,7 +30,7 @@
 .theme-clair .conteneur { width: min(var(--largeur), 100% - 80px); }
 .theme-clair section.bloc > .conteneur > header p { max-width: 900px; }
 .theme-clair .grille { gap: 24px; }
-.theme-clair .carte-info { padding: 26px 28px; box-shadow: 0 1px 2px rgba(30, 30, 28, .05); }
+.theme-clair .carte-info { padding: 26px 28px; box-shadow: 0 1px 2px rgba(17, 24, 39, .05); }
 
 /* ---------- En-tête clair ---------- */
 .theme-clair .entete { background: rgba(255, 255, 255, .94); }
@@ -53,7 +53,7 @@
   background: var(--surface); border-color: var(--bordure-2);
 }
 .theme-clair .recherche .champ:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-doux); }
-.theme-clair .resultats { background: var(--surface); box-shadow: 0 10px 28px rgba(30, 30, 28, .14); }
+.theme-clair .resultats { background: var(--surface); box-shadow: 0 10px 28px rgba(17, 24, 39, .14); }
 .theme-clair .resultats li[aria-selected="true"], .theme-clair .resultats li:hover { background: var(--surface-2); }
 
 /* ---------- Sections ---------- */
@@ -63,14 +63,14 @@
 }
 .theme-clair .surtitre span { color: var(--accent); font-family: var(--police-titres); margin-right: 6px; }
 .theme-clair h2 { font-size: clamp(1.6rem, 2.8vw, 2.1rem); }
-.theme-clair .avertissement { background: #FBF4E4; border-left-color: #B7791F; color: #5B4413; }
+.theme-clair .avertissement { background: var(--accent-doux); border-left-color: var(--accent); color: var(--texte); }
 
 /* ---------- Infobulle : claire aussi (sinon texte sombre sur fond sombre) ---------- */
-.theme-clair .infobulle { background: #FFFFFF; color: var(--texte); border-color: var(--bordure-2); box-shadow: 0 10px 28px rgba(30, 30, 28, .18); }
+.theme-clair .infobulle { background: #FFFFFF; color: var(--texte); border-color: var(--bordure-2); box-shadow: 0 10px 28px rgba(17, 24, 39, .18); }
 
 /* ---------- Tableaux et éléments de la page Classification ---------- */
 .theme-clair table.donnees thead th { background: var(--surface-2); }
-.theme-clair td.diagonale { outline-color: rgba(30, 30, 28, .6); }
+.theme-clair td.diagonale { outline-color: rgba(17, 24, 39, .6); }
 .theme-clair .stabilite.Stable   { color: #166534; border-color: rgba(22, 101, 52, .4); }
 .theme-clair .stabilite.Modérée  { color: #8A5A00; border-color: rgba(138, 90, 0, .4); }
 .theme-clair .stabilite.Fragile  { color: #B42318; border-color: rgba(180, 35, 24, .4); }
