@@ -100,6 +100,34 @@
         <h3 style="margin-top: 32px;">Écarts à la moyenne du territoire (z-scores)</h3>
         <p class="tres-discret">Bleu = en dessous de la moyenne du territoire, rouge = au-dessus ; en écarts-types.</p>
         <div class="tableau-conteneur"><table class="donnees" id="table-z"></table></div>
+
+        <!-- Arbre de Ward des 5 classes + profil de chaque classe (données : data/arbres.json) -->
+        <div id="bloc-arbre" hidden>
+          <h3 style="margin-top: 32px;">Arbre de classification et profils des classes</h3>
+          <p class="tres-discret">Plus deux classes se rejoignent tôt dans l'arbre (à droite), plus leurs profils se ressemblent.
+            Coupez l'arbre pour voir la part de la variance que garde chaque regroupement.</p>
+          <div class="arbre-carte">
+            <div class="arbre-barre">
+              <div>
+                <span class="arbre-etiquette">Couper en</span>
+                <div class="commutateur" id="arbre-k" role="group" aria-label="Nombre de classes">
+                  <button type="button" data-k="2" aria-pressed="false">2</button>
+                  <button type="button" data-k="3" aria-pressed="false">3</button>
+                  <button type="button" data-k="4" aria-pressed="false">4</button>
+                  <button type="button" data-k="5" aria-pressed="true">5</button>
+                </div>
+                <span class="arbre-etiquette">classes</span>
+              </div>
+              <div class="arbre-variance" id="arbre-variance"></div>
+            </div>
+            <div class="arbre-defilement">
+              <div class="arbre-grille" id="arbre-grille"></div>
+            </div>
+            <div class="arbre-lecture" id="arbre-lecture"></div>
+            <p class="arbre-note">Arbre calculé sur les centres des 5 classes publiées, avec le critère de Ward et dans l'espace
+              des axes retenus de l'ACP. Barres : écart à la moyenne du territoire, en écarts-types (z-scores du tableau ci-dessus).</p>
+          </div>
+        </div>
       </div>
     </section>
 

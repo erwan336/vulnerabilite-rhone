@@ -1,0 +1,185 @@
+{
+ "note": "Arbre de Ward des 5 classes publiées (espace des axes ACP retenus). hauteur = sqrt(2 x coût de Ward), comme ward.D2 de R. part_variance_pct = inertie inter-classes / inertie totale (5 variables centrées-réduites).",
+ "territoires": {
+  "departement": {
+   "noeuds": [
+    {
+     "id": "n1",
+     "gauche": "1",
+     "droite": "2",
+     "hauteur": 16.02,
+     "codes": [
+      1,
+      2
+     ],
+     "n_iris": 285
+    },
+    {
+     "id": "n2",
+     "gauche": "4",
+     "droite": "n1",
+     "hauteur": 27.14,
+     "codes": [
+      1,
+      2,
+      4
+     ],
+     "n_iris": 454
+    },
+    {
+     "id": "n3",
+     "gauche": "3",
+     "droite": "n2",
+     "hauteur": 32.94,
+     "codes": [
+      1,
+      2,
+      3,
+      4
+     ],
+     "n_iris": 623
+    },
+    {
+     "id": "n4",
+     "gauche": "5",
+     "droite": "n3",
+     "hauteur": 52.07,
+     "codes": [
+      1,
+      2,
+      3,
+      4,
+      5
+     ],
+     "n_iris": 731
+    }
+   ],
+   "part_variance_pct": {
+    "1": 0.0,
+    "2": 37.4,
+    "3": 52.5,
+    "4": 63.2,
+    "5": 67.3
+   }
+  },
+  "metropole": {
+   "noeuds": [
+    {
+     "id": "n1",
+     "gauche": "1",
+     "droite": "2",
+     "hauteur": 15.71,
+     "codes": [
+      1,
+      2
+     ],
+     "n_iris": 202
+    },
+    {
+     "id": "n2",
+     "gauche": "3",
+     "droite": "4",
+     "hauteur": 21.09,
+     "codes": [
+      3,
+      4
+     ],
+     "n_iris": 194
+    },
+    {
+     "id": "n3",
+     "gauche": "n1",
+     "droite": "n2",
+     "hauteur": 25.02,
+     "codes": [
+      1,
+      2,
+      3,
+      4
+     ],
+     "n_iris": 396
+    },
+    {
+     "id": "n4",
+     "gauche": "5",
+     "droite": "n3",
+     "hauteur": 45.99,
+     "codes": [
+      1,
+      2,
+      3,
+      4,
+      5
+     ],
+     "n_iris": 493
+    }
+   ],
+   "part_variance_pct": {
+    "1": 0.0,
+    "2": 43.0,
+    "3": 56.1,
+    "4": 65.2,
+    "5": 70.3
+   }
+  },
+  "hors_metropole": {
+   "noeuds": [
+    {
+     "id": "n1",
+     "gauche": "4",
+     "droite": "5",
+     "hauteur": 11.48,
+     "codes": [
+      4,
+      5
+     ],
+     "n_iris": 21
+    },
+    {
+     "id": "n2",
+     "gauche": "2",
+     "droite": "3",
+     "hauteur": 12.25,
+     "codes": [
+      2,
+      3
+     ],
+     "n_iris": 145
+    },
+    {
+     "id": "n3",
+     "gauche": "1",
+     "droite": "n2",
+     "hauteur": 21.25,
+     "codes": [
+      1,
+      2,
+      3
+     ],
+     "n_iris": 217
+    },
+    {
+     "id": "n4",
+     "gauche": "n1",
+     "droite": "n3",
+     "hauteur": 27.24,
+     "codes": [
+      1,
+      2,
+      3,
+      4,
+      5
+     ],
+     "n_iris": 238
+    }
+   ],
+   "part_variance_pct": {
+    "1": 0.0,
+    "2": 31.2,
+    "3": 50.6,
+    "4": 57.1,
+    "5": 63.4
+   }
+  }
+ }
+}

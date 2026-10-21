@@ -14,7 +14,8 @@
     limites:         "data/limites.geojson",
     qpv:             "data/qpv.geojson",
     qpv2024:         "data/qpv2024_rhone.geojson",  // QPV 2024 (ANCT), tout le département
-    actions:         "data/actions.geojson"         // lieux d'action 2022-2024 (fichier prévisionnel)
+    actions:         "data/actions.geojson",        // lieux d'action 2022-2024 (fichier prévisionnel)
+    arbres:          "data/arbres.json"             // arbre de Ward des 5 classes, par territoire
   };
   const cache = {};
 

@@ -5,10 +5,14 @@
 (function () {
   "use strict";
   const S = window.Site;
-  let META, CLASSIF, stat = "medianes", terrActif = null;
+  let META, CLASSIF, ARBRES = null, stat = "medianes", terrActif = null, kArbre = 5;
 
-  S.chargerTout(["meta", "classifications"]).then(function (d) {
+  S.chargerTout(["meta", "classifications", "arbres"], ["arbres"]).then(function (d) {
     META = d.meta; CLASSIF = d.classifications;
+    ARBRES = d.arbres ? d.arbres.territoires : null;
+    document.querySelectorAll("#arbre-k button").forEach(function (b) {
+      b.addEventListener("click", function () { kArbre = +b.dataset.k; arbre(CLASSIF[terrActif]); });
+    });
 
     // Onglets
     const onglets = document.getElementById("onglets");
@@ -51,6 +55,7 @@
     cartesClasses(c);
     tableProfils(c);
     tableZ(c);
+    arbre(c);
     croisement(c);
     histoACP(c);
     histoK(c);
@@ -142,6 +147,144 @@
           " sur le territoire";
       });
     });
+  }
+
+  /* ---------- Arbre de Ward des 5 classes + profils (data/arbres.json) ----------
+     Racine à gauche, feuilles à droite ; chaque feuille est alignée avec la ligne de sa classe,
+     qui porte une barre par variable (écart à la moyenne en écarts-types, depuis 0). */
+  // Lecture de l'arbre, par échelle ({k2} et {k5} : part de variance pour 2 et 5 classes)
+  const LECTURES_ARBRE = {
+    departement: [
+      "<b>Première coupure ({k2} de la variance)</b> : la vulnérabilité <b>très élevée</b> (Vénissieux, Vaulx-en-Velin…) " +
+        "se détache de tout le reste, avec des revenus très bas et beaucoup de non-diplômés et d'immigrés.",
+      "<b>Très faible</b> et <b>faible</b> sont les classes les plus proches : elles fusionnent en premier, " +
+        "puis la classe <b>élevée</b> (profil ouvrier, surtout rural) les rejoint.",
+      "La classe <b>modérée</b> (centre dense) reste à part longtemps : c'est la suroccupation des logements, " +
+        "pas le revenu, qui la distingue.",
+      "Avec 5 classes, la typologie résume <b>{k5}</b> de la variance des 5 indicateurs."
+    ],
+    metropole: [
+      "<b>Première coupure ({k2} de la variance)</b> : la vulnérabilité <b>très élevée</b> (Vénissieux, Vaulx-en-Velin, " +
+        "Lyon 8e) contre le reste de la Métropole.",
+      "Le reste se partage en deux familles : les quartiers aisés (<b>très faible</b> + <b>faible</b>) et les quartiers " +
+        "intermédiaires (<b>modérée</b> + <b>élevée</b>).",
+      "<b>Élevée</b> et <b>modérée</b> sont proches : la classe élevée s'en distingue surtout par la suroccupation " +
+        "(centre de Lyon, Villeurbanne).",
+      "Avec 5 classes, la typologie résume <b>{k5}</b> de la variance des 5 indicateurs."
+    ],
+    hors_metropole: [
+      "<b>Première coupure ({k2} de la variance)</b> : les quartiers urbains défavorisés (<b>élevée</b> + <b>très élevée</b>, " +
+        "Villefranche-sur-Saône, Tarare) contre le reste du territoire.",
+      "Les 4 IRIS <b>très élevée</b> sont extrêmes : jusqu'à 5 écarts-types au-dessus de la moyenne pour la part d'immigrés " +
+        "(barres coupées, valeur indiquée).",
+      "<b>Faible</b> et <b>modérée</b> (bourgs ouvriers) sont proches ; la classe <b>très faible</b> (communes aisées comme " +
+        "Genas ou Chaponost) s'en sépare ensuite.",
+      "Avec 5 classes, la typologie résume <b>{k5}</b> de la variance des 5 indicateurs."
+    ]
+  };
+
+  function arbre(c) {
+    const bloc = document.getElementById("bloc-arbre");
+    const a = ARBRES && ARBRES[c.id];
+    bloc.hidden = !a;
+    if (!a) return;
+    const pct = function (k) { return S.nombre(a.part_variance_pct[k], 1) + " %"; };
+    document.querySelectorAll("#arbre-k button").forEach(function (b) {
+      b.setAttribute("aria-pressed", +b.dataset.k === kArbre);
+    });
+
+    // Nœuds : feuilles "1" à "5" (codes de classe), fusions "n1" à "n4" (de la plus basse à la plus haute)
+    const noeuds = {}, classes = {};
+    c.classes.forEach(function (k) { classes[k.code] = k; noeuds[String(k.code)] = { h: 0, code: k.code }; });
+    a.noeuds.forEach(function (n) { noeuds[n.id] = { h: n.hauteur, g: n.gauche, d: n.droite }; });
+    const racine = a.noeuds[a.noeuds.length - 1].id;
+    const ordre = [];
+    (function parcourir(id) { const n = noeuds[id]; if (n.g) { parcourir(n.g); parcourir(n.d); } else ordre.push(n.code); })(racine);
+
+    // Coupure : entre la (5-K)e et la (5-K+1)e fusion ; groupes = classes reliées sous la coupure
+    const hs = a.noeuds.map(function (n) { return n.hauteur; });
+    const nb = 5 - kArbre;
+    const hCoupe = ((nb ? hs[nb - 1] : 0) + hs[nb]) / 2;
+    const groupe = {};
+    (function marquer(id, g) {
+      const n = noeuds[id];
+      const gg = g || (n.h < hCoupe ? id : null);
+      if (n.g) { marquer(n.g, gg); marquer(n.d, gg); } else groupe[n.code] = gg || id;
+    })(racine, null);
+
+    // Arbre en SVG
+    const L = 64, W = 190, M = 12, hMax = hs[hs.length - 1];
+    const x = function (h) { return M + (1 - h / hMax) * (W - 2 * M); };
+    const pos = {};
+    ordre.forEach(function (code, i) { pos[String(code)] = { y: (i + 0.5) * L }; });
+    let traits = "";
+    a.noeuds.forEach(function (n) {
+      const g = pos[n.gauche], d = pos[n.droite], xn = x(n.hauteur);
+      pos[n.id] = { y: (g.y + d.y) / 2 };
+      [[n.gauche, g], [n.droite, d]].forEach(function (e) {
+        // Branche vers une classe restée seule sous la coupure : couleur de la classe
+        const enfant = noeuds[e[0]];
+        const coul = enfant.code && n.hauteur >= hCoupe ? classes[enfant.code].couleur : null;
+        traits += '<path class="branche' + (n.hauteur < hCoupe ? " sous-coupe" : "") + '" d="M' + xn + "," + e[1].y +
+          "H" + x(enfant.h) + '"' + (coul ? ' style="stroke:' + coul + '"' : "") + "/>";
+      });
+      traits += '<path class="branche' + (n.hauteur < hCoupe ? " sous-coupe" : "") + '" d="M' + xn + "," + g.y + "V" + d.y + '"/>';
+      traits += '<circle class="noeud" cx="' + xn + '" cy="' + pos[n.id].y + '" r="3"><title>Fusion à la hauteur ' +
+        S.nombre(n.hauteur, 1) + "</title></circle>";
+    });
+    const xr = x(hMax), yr = pos[racine].y, xc = x(hCoupe);
+    traits = '<path class="branche" d="M' + (xr - 8) + "," + yr + "H" + xr + '"/>' + traits +
+      '<line class="coupure" x1="' + xc + '" y1="2" x2="' + xc + '" y2="' + (5 * L - 2) + '"/>' +
+      '<text class="coupure-texte" x="' + (xc + 4) + '" y="12">coupure</text>';
+    const svg = '<svg class="arbre-svg" width="' + W + '" height="' + 5 * L + '" viewBox="0 0 ' + W + " " + 5 * L +
+      '" role="img" aria-label="Arbre de classification des 5 classes">' + traits + "</svg>";
+
+    // Échelle des barres : ±2 ou ±3 écarts-types ; au-delà, la barre est coupée et la valeur affichée
+    let maxZ = 0;
+    c.classes.forEach(function (k) { META.variables.forEach(function (v) { maxZ = Math.max(maxZ, Math.abs(k.z_scores[v.id])); }); });
+    const E = Math.min(3, Math.max(2, Math.ceil(maxZ)));
+
+    let h = '<div class="arbre-entete arbre-col-arbre"></div><div class="arbre-entete">Classe</div>' +
+      META.variables.map(function (v) {
+        return '<div class="arbre-entete arbre-var"><span>' + S.echapper(v.libelle) + "</span>" +
+          '<span class="graduation"><i>−' + E + "</i><i>0</i><i>+" + E + "</i></span></div>";
+      }).join("") +
+      '<div class="arbre-col-arbre" style="grid-row: 2 / span 5">' + svg + "</div>";
+    let precedent = null, parite = 0;
+    ordre.forEach(function (code, i) {
+      const k = classes[code];
+      if (precedent !== null && groupe[code] !== precedent) parite = 1 - parite;
+      const debut = precedent !== null && groupe[code] !== precedent;
+      precedent = groupe[code];
+      const cls = "arbre-cellule groupe-" + parite + (debut ? " debut-groupe" : "");
+      h += '<div class="' + cls + ' arbre-classe" style="grid-row:' + (i + 2) + '"><span class="pastille-couleur" style="background:' +
+        k.couleur + '"></span><span>' + S.echapper(k.niveau) + "<small>" + S.nombre(k.n_iris) + " IRIS</small></span></div>" +
+        META.variables.map(function (v) {
+          const z = k.z_scores[v.id], l = Math.min(Math.abs(z), E) / E * 50, coupe = Math.abs(z) > E;
+          return '<div class="' + cls + '" style="grid-row:' + (i + 2) + '"><div class="axe-z" data-niv="' + code + '" data-var="' + v.id + '">' +
+            '<span class="barre-z' + (coupe ? " coupee" : "") + '" style="background:' + k.couleur + ";" +
+            (z >= 0 ? "left:50%" : "right:50%") + ";width:" + l.toFixed(1) + '%"></span>' +
+            (coupe ? '<span class="valeur-coupee" style="' + (z >= 0 ? "right:0" : "left:0") + '">' + (z > 0 ? "+" : "") +
+              S.nombre(z, 1) + "</span>" : "") + "</div></div>";
+        }).join("");
+    });
+    const grille = document.getElementById("arbre-grille");
+    grille.innerHTML = h;
+    grille.querySelectorAll(".axe-z").forEach(function (el) {
+      S.infobulle(el, function () {
+        const k = classes[el.dataset.niv], v = el.dataset.var, z = k.z_scores[v];
+        return "<strong>" + S.echapper(k.niveau_long) + "</strong><br>" + S.echapper(S.variable(META, v).libelle) + " : " +
+          (z > 0 ? "+" : "") + S.nombre(z, 2) + " écart-type<br>moyenne " + S.valeur(META, v, k.moyennes[v]) + " contre " +
+          S.valeur(META, v, c.ensemble.moyennes[v]) + " sur le territoire";
+      });
+    });
+
+    document.getElementById("arbre-variance").innerHTML =
+      '<strong>' + pct(kArbre) + "</strong><span>de la variance expliquée avec " + kArbre + " classes</span>" +
+      '<span class="jauge"><i style="width:' + a.part_variance_pct[kArbre] + '%"></i></span>';
+    document.getElementById("arbre-lecture").innerHTML = (LECTURES_ARBRE[c.id] ? "<ul>" + LECTURES_ARBRE[c.id].map(function (t) {
+      return "<li>" + t.replace("{k2}", pct(2)).replace("{k5}", pct(5)) + "</li>";
+    }).join("") + "</ul>" : "");
   }
 
   /* ---------- Croisement avec le département ---------- */
