@@ -57,7 +57,7 @@
 .theme-clair .resultats li[aria-selected="true"], .theme-clair .resultats li:hover { background: var(--surface-2); }
 
 /* ---------- Sections ---------- */
-.theme-clair section.bloc { padding: 64px 0; }
+.theme-clair section.bloc { padding: 52px 0; }
 .theme-clair .surtitre {
   color: var(--texte-2); font-size: .85rem; font-weight: 600; letter-spacing: 0; text-transform: none; margin-bottom: 10px;
 }
@@ -83,3 +83,11 @@
   .theme-clair .conteneur { width: calc(100% - 32px); }
   .theme-clair .nav a { margin-left: 10px; }
 }
+
+/* ---------- Finitions ---------- */
+/* Logo : un peu d'air entre le titre et « des IRIS du Rhône » */
+.logo span { line-height: 1.15; }
+.logo small { margin-top: 3px; }
+/* Apparition en fondu au défilement (classe posée par commun.js) */
+.reveler { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s cubic-bezier(.2, .7, .2, 1); }
+.reveler.visible { opacity: 1; transform: none; }

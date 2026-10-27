@@ -58,6 +58,7 @@
     document.getElementById("chiffres").innerHTML = chiffres.map(function (t) {
       return '<div><dt class="num">' + S.echapper(t.v) + "</dt><dd>" + S.echapper(t.l) + "</dd></div>";
     }).join("");
+    compterChiffres(document.querySelectorAll("#chiffres dt"));
 
     // ---- Cartes des 3 territoires ----
     const conteneur = document.getElementById("territoires");
@@ -87,7 +88,7 @@
     };
     document.getElementById("indicateurs").innerHTML = meta.variables.map(function (v) {
       return '<article class="indicateur">' +
-        (PHOTOS[v.id] ? '<img src="' + PHOTOS[v.id] + '" alt="" loading="lazy">' : "") +
+        (PHOTOS[v.id] ? '<div class="indicateur-image"><img src="' + PHOTOS[v.id] + '" alt="" loading="lazy"></div>' : "") +
         '<div class="indicateur-texte"><h3>' + S.echapper(v.libelle) + ' <span class="unite">' + S.echapper(v.unite) + "</span></h3>" +
         '<p class="definition">' + S.echapper(v.libelle_long) + "</p>" +
         '<p class="sens">' + S.echapper(v.sens) + "</p>" +
@@ -122,6 +123,28 @@
       if (geo) dessinerMiniCarte(geo, meta);
     }).catch(function () { /* la mini-carte reste vide, le reste de la page fonctionne */ });
   }).catch(function () { /* bandeau d'erreur affiché par commun.js */ });
+
+  /** Chiffres clés : comptent de 0 jusqu'à leur valeur quand ils arrivent à l'écran ("1,9 M", "752"…). */
+  function compterChiffres(elements) {
+    if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const obs = new IntersectionObserver(function (entrees) {
+      entrees.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        obs.unobserve(e.target);
+        const el = e.target, final = el.textContent;
+        const m = final.match(/^([\d\s  ]*\d(?:,\d+)?)(.*)$/);
+        if (!m) return;
+        const cible = parseFloat(m[1].replace(/[\s  ]/g, "").replace(",", "."));
+        const dec = (m[1].split(",")[1] || "").length, debut = performance.now(), duree = 1400;
+        (function etape(t) {
+          const p = Math.min(1, (t - debut) / duree), v = cible * (1 - Math.pow(1 - p, 3));
+          el.textContent = p < 1 ? v.toLocaleString("fr-FR", { minimumFractionDigits: dec, maximumFractionDigits: dec }) + m[2] : final;
+          if (p < 1) requestAnimationFrame(etape);
+        })(debut);
+      });
+    }, { threshold: 0.6 });
+    elements.forEach(function (el) { obs.observe(el); });
+  }
 
   // ---- Partenaires : la liste est doublée pour que le défilement boucle sans saut ----
   const piste = document.getElementById("piste-partenaires");

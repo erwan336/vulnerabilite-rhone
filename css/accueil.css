@@ -161,3 +161,21 @@
   .logos li { height: 72px; padding: 0 14px; }
   .logos img { max-height: 48px; max-width: 150px; }
 }
+
+/* ---------- Indicateurs : traitement commun des images ----------
+   Images d'origines différentes harmonisées en monochrome bleu (couleur d'accent) ;
+   elles retrouvent leurs couleurs au survol de la carte. */
+.indicateur-image { position: relative; height: 190px; overflow: hidden; background: var(--accent); }
+.indicateur-image img {
+  height: 100%; filter: grayscale(1) contrast(1.08) brightness(1.04);
+  transition: filter .5s ease, transform .6s ease;
+}
+.indicateur-image::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(160deg, #2C6AA0 0%, var(--accent) 100%);
+  mix-blend-mode: color; opacity: .9; transition: opacity .5s ease;
+}
+.indicateur { transition: transform .3s ease, box-shadow .3s ease; }
+.indicateur:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(30, 30, 28, .12); }
+.indicateur:hover .indicateur-image img { filter: none; transform: scale(1.04); }
+.indicateur:hover .indicateur-image::after { opacity: 0; }

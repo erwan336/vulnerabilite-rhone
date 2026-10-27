@@ -236,6 +236,20 @@
     }).catch(function () { /* bandeau déjà affiché */ });
   });
 
+  /* Pages claires : les blocs apparaissent en fondu quand on les fait défiler.
+     La classe n'est posée que par le script : sans JavaScript, tout reste visible. */
+  document.addEventListener("DOMContentLoaded", function () {
+    if (!document.body.classList.contains("theme-clair") || !("IntersectionObserver" in window) ||
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const cibles = document.querySelectorAll("section.bloc > .conteneur > *, .enjeu-texte, .bandeau-chiffres dl");
+    const obs = new IntersectionObserver(function (entrees) {
+      entrees.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("visible"); obs.unobserve(e.target); }
+      });
+    }, { rootMargin: "0px 0px -8% 0px" });
+    cibles.forEach(function (el) { el.classList.add("reveler"); obs.observe(el); });
+  });
+
   window.Site = {
     charger: charger, chargerTout: chargerTout,
     nombre: nombre, population: population, valeur: valeur, variable: variable,
