@@ -239,6 +239,8 @@
   /* Pages claires : les blocs apparaissent en fondu quand on les fait défiler.
      La classe n'est posée que par le script : sans JavaScript, tout reste visible. */
   document.addEventListener("DOMContentLoaded", function () {
+    // L'accueil a ses propres animations (GSAP, accueil-anim.js)
+    if (document.documentElement.classList.contains("anim-gsap")) return;
     if (!document.body.classList.contains("theme-clair") || !("IntersectionObserver" in window) ||
         window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const cibles = document.querySelectorAll("section.bloc > .conteneur > *, .enjeu-texte, .bandeau-chiffres dl");
