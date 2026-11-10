@@ -237,14 +237,14 @@
   });
 
   /* ---------- Mode sombre (pages Accueil et Classification ; la Carte est déjà sombre) ----------
-     Disque à moitié plein : il fait un demi-tour à chaque changement. */
+     Icône « Dark mode » (Uicons solid straight, Flaticon : crédit dans le pied de page). */
   function boutonTheme() {
     const nav = document.querySelector(".nav");
     if (!nav || !document.body.classList.contains("theme-clair")) return;
     const b = document.createElement("button");
     b.type = "button"; b.className = "bouton-theme";
-    b.innerHTML = '<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" ' +
-      'fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 1.75a8.25 8.25 0 0 1 0 16.5z" fill="currentColor"/></svg>';
+    b.innerHTML = '<svg width="20" height="20" viewBox="0 0 300 300" aria-hidden="true"><path fill="currentColor" transform="translate(0 298) scale(1 -1)" d="' +
+      'M100 225H63V250H100ZM38 250H0V225H38ZM300 113V38Q300 22 289.0 11.0Q278 0 262 0H163V150H263Q278 150 289.0 139.0Q300 128 300 112ZM235 75Q235 90 244.5 102.0Q254 114 269 118Q257 125 244 125Q223 125 208.5 110.5Q194 96 194.0 75.0Q194 54 208.5 39.5Q223 25 244 25Q257 25 269 32Q254 36 244.5 48.0Q235 60 235 75ZM234 196 252 179 293 220Q300 227 300.0 237.5Q300 248 293 255L252 296L234 279L263 250H125V225H262ZM38 150H138V0H38Q22 0 11.0 11.0Q0 22 0 38V113Q0 128 11.0 139.0Q22 150 38 150ZM45 103 32 111 19 89 32 82Q31 78 31.0 75.0Q31 72 32 68L19 61L32 39L45 47Q50 42 56 40V25H81V40Q88 42 93 47L106 39L118 61L106 68Q106 72 106.0 75.0Q106 78 106 82L118 89L106 111L93 103Q88 108 81 110V125H56V110Q50 108 45 103Z"/></svg>';
     function maj() {
       const sombre = document.documentElement.getAttribute("data-theme") === "sombre";
       const texte = sombre ? "Passer en mode clair" : "Passer en mode sombre";
