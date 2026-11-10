@@ -116,7 +116,7 @@
         <!-- Arbre de Ward des 5 classes + profil de chaque classe (données : data/arbres.json) -->
         <div id="bloc-arbre" hidden>
           <h3 style="margin-top: 32px;">Arbre de classification et profils des classes</h3>
-          <p class="tres-discret">Plus deux classes se rejoignent tôt dans l'arbre (à droite), plus leurs profils se ressemblent.
+          <p class="tres-discret">Plus deux classes se rejoignent tôt dans l'arbre (<span id="arbre-sens-texte">à droite</span>), plus leurs profils se ressemblent.
             Coupez l'arbre pour voir la part de la variance que garde chaque regroupement.</p>
           <div class="arbre-carte">
             <div class="arbre-barre">
@@ -130,11 +130,21 @@
                 </div>
                 <span class="arbre-etiquette">classes</span>
               </div>
+              <div>
+                <span class="arbre-etiquette">Axes</span>
+                <div class="commutateur" id="arbre-sens" role="group" aria-label="Orientation de l'arbre">
+                  <button type="button" data-sens="horizontal" aria-pressed="true">Classes en lignes</button>
+                  <button type="button" data-sens="vertical" aria-pressed="false">Classes en colonnes</button>
+                </div>
+              </div>
               <div class="arbre-variance" id="arbre-variance"></div>
             </div>
+            <!-- Cases « Mettre en avant » : une par regroupement sous la coupure ; les autres classes s'estompent -->
+            <div class="arbre-focus" id="arbre-focus" role="group" aria-label="Mettre en avant un regroupement"></div>
             <div class="arbre-defilement">
               <div class="arbre-grille" id="arbre-grille"></div>
             </div>
+            <p class="arbre-note arbre-ordre" id="arbre-ordre" hidden></p>
             <div class="arbre-lecture" id="arbre-lecture"></div>
             <p class="arbre-note">Arbre calculé sur les centres des 5 classes publiées, avec le critère de Ward et dans l'espace
               des axes retenus de l'ACP. Barres : écart à la moyenne du territoire, en écarts-types (z-scores du tableau ci-dessus).</p>

@@ -463,7 +463,7 @@ select.selecteur {
 #bloc-arbre[hidden] { display: none; }
 .arbre-carte { background: var(--surface); border: 1px solid var(--bordure); border-radius: var(--rayon); padding: 20px 22px 18px; }
 .arbre-barre { display: flex; justify-content: space-between; align-items: center; gap: 14px 28px; flex-wrap: wrap; margin-bottom: 14px; }
-.arbre-barre > div:first-child { display: flex; align-items: center; gap: 10px; }
+.arbre-barre > div:not(.arbre-variance) { display: flex; align-items: center; gap: 10px; }
 .arbre-etiquette { font-size: .85rem; color: var(--texte-2); }
 .arbre-variance { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 2px 10px; min-width: 260px; }
 .arbre-variance strong { font-family: var(--police-titres); font-size: 1.7rem; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
@@ -472,8 +472,8 @@ select.selecteur {
 .arbre-variance .jauge i { display: block; height: 100%; background: var(--accent); border-radius: 3px; transition: width .4s ease; }
 .arbre-defilement { overflow-x: auto; }
 .arbre-grille {
-  display: grid; grid-template-columns: 190px minmax(130px, 160px) repeat(5, minmax(96px, 1fr));
-  grid-template-rows: auto repeat(5, 64px); min-width: 860px;
+  display: grid; grid-template-columns: 260px minmax(130px, 160px) repeat(5, minmax(96px, 1fr));
+  grid-template-rows: auto repeat(5, 64px); min-width: 930px;
 }
 .arbre-col-arbre { grid-column: 1; }
 .arbre-entete { grid-row: 1; padding: 0 10px 8px; font-size: .74rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--texte-3); align-self: end; }
@@ -502,6 +502,30 @@ select.selecteur {
 .arbre-svg .branche.sous-coupe { stroke: var(--texte); stroke-width: 2.4; }
 .arbre-svg .noeud { fill: var(--surface); stroke: var(--texte-3); stroke-width: 1.5; }
 .arbre-svg .coupure { stroke: #C2410C; stroke-width: 1.5; stroke-dasharray: 5 4; transition: all .4s ease; }
+/* Classes en colonnes : arbre debout au-dessus, barres verticales (positif vers le haut) */
+.arbre-grille.vertical {
+  grid-template-columns: 150px repeat(5, minmax(100px, 1fr)); grid-template-rows: 180px auto repeat(5, 96px); min-width: 700px;
+}
+.arbre-v-arbre { grid-column: 2 / span 5; grid-row: 1; position: relative; }
+.arbre-v-arbre .arbre-svg { width: 100%; height: 100%; }
+.arbre-v-arbre .arbre-svg path, .arbre-v-arbre .arbre-svg line { vector-effect: non-scaling-stroke; }   /* SVG étiré : traits nets */
+.coupure-etiquette { position: absolute; right: 2px; transform: translateY(-120%); font: 600 10px var(--police); color: #C2410C; }
+.arbre-v-coin { grid-column: 1; grid-row: 2; align-self: center; }
+.arbre-classe-v { grid-row: 2; flex-direction: column; justify-content: center; text-align: center; gap: 4px; padding: 10px 6px; }
+.arbre-var-v { grid-column: 1; display: flex; justify-content: space-between; align-items: center; gap: 8px; align-self: stretch; }
+.graduation-v { display: flex; flex-direction: column; justify-content: space-between; height: 80px; text-align: right;
+  font-weight: 500; text-transform: none; letter-spacing: 0; font-size: .68rem; }
+.graduation-v i { font-style: normal; line-height: 1; }
+.arbre-grille.vertical .arbre-cellule { justify-content: center; border-top: 0; border-left: 1px solid transparent; }
+.arbre-grille.vertical .debut-groupe-v { border-left-color: var(--bordure-2); }
+.axe-z-v { width: 28px; height: 80px; margin: 0 auto; }
+.axe-z-v::before { left: -40px; right: -40px; top: 50%; bottom: auto; border-left: 0; border-top: 1px solid var(--texte-3); }
+.axe-z-v .barre-z { top: auto; bottom: auto; left: 2px; right: 2px; transform-origin: bottom center; animation-name: barre-z-monte; }
+.axe-z-v .barre-z.negative { transform-origin: top center; }
+.axe-z-v .barre-z.coupee { -webkit-mask-image: linear-gradient(0deg, #000 85%, transparent); mask-image: linear-gradient(0deg, #000 85%, transparent); }
+.axe-z-v .barre-z.coupee.negative { -webkit-mask-image: linear-gradient(180deg, #000 85%, transparent); mask-image: linear-gradient(180deg, #000 85%, transparent); }
+.axe-z-v .valeur-coupee { top: auto; left: calc(100% + 5px); white-space: nowrap; }   /* à côté du bout de la barre */
+@keyframes barre-z-monte { from { transform: scaleY(0); } }
 .arbre-svg .coupure-texte { fill: #C2410C; font: 600 10px var(--police); }
 .arbre-lecture ul { margin: 18px 0 0; padding: 14px 18px 14px 34px; background: var(--accent-doux); border-radius: var(--rayon-s); display: grid; gap: 6px; font-size: .9rem; color: var(--texte-2); }
 .arbre-lecture b { color: var(--texte); font-weight: 600; }
@@ -574,3 +598,44 @@ a:hover .fleche, a:focus-visible .fleche { transform: translateX(4px); }
   .chargement-barres i:nth-child(1) { transform: scaleY(.4); }  .chargement-barres i:nth-child(2) { transform: scaleY(.55); }
   .chargement-barres i:nth-child(3) { transform: scaleY(.7); }  .chargement-barres i:nth-child(4) { transform: scaleY(.85); }
 }
+.arbre-ordre[hidden] { display: none; }
+.arbre-ordre { margin-top: 14px; color: var(--texte-2); }
+.arbre-ordre b { color: var(--texte); font-weight: 600; }
+/* Pont : halo couleur du fond sous chaque trait, pour couper proprement les branches croisées */
+.arbre-svg .halo { fill: none; stroke: var(--surface); stroke-width: 7; stroke-linecap: butt; }
+.arbre-v-arbre .arbre-svg .halo { vector-effect: non-scaling-stroke; }
+
+/* « Mettre en avant » un regroupement de l'arbre : les autres classes s'estompent (flou + transparence) */
+.arbre-focus { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 0 0 14px; }
+/* Cases sur la ligne de coupure de l'arbre */
+.arbre-zone { position: relative; }
+.coche-coupure { position: absolute; z-index: 2; width: 14px; height: 14px; margin: -7px 0 0 -7px; cursor: pointer; }   /* 14 px : deux branches voisines (croisement) restent séparées */
+.coche-coupure input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+.coche-coupure span {
+  display: block; width: 100%; height: 100%; box-sizing: border-box; border-radius: 3px;
+  border: 2px solid #C2410C; background: var(--surface); box-shadow: 0 1px 3px rgba(0, 0, 0, .18);
+  transition: transform .15s ease, background .15s ease;
+}
+.coche-coupure:hover span { transform: scale(1.25); }
+.coche-coupure input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.coche-coupure input:checked + span { background: #C2410C; }
+.coche-coupure input:checked + span::after {
+  content: ""; display: block; width: 3px; height: 6px; margin: 1px auto 0; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg);
+}
+.tout-afficher { border: 0; background: none; color: var(--accent); font: 600 .82rem var(--police); cursor: pointer; padding: 6px 4px; }
+.tout-afficher[hidden] { display: none; }
+.arbre-grille [data-code], .arbre-grille [data-codes] { transition: opacity .35s ease, filter .35s ease; }
+.arbre-grille .estompe { opacity: .22; filter: blur(1.5px) grayscale(.6); }
+@media (prefers-reduced-motion: reduce) { .arbre-grille [data-code], .arbre-grille [data-codes] { transition: none; } }
+
+/* Cases rondes sur les points de fusion de l'arbre */
+.coche-fusion { position: absolute; z-index: 3; width: 12px; height: 12px; margin: -6px 0 0 -6px; cursor: pointer; }
+.coche-fusion input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+.coche-fusion span {
+  display: block; width: 100%; height: 100%; box-sizing: border-box; border-radius: 50%;
+  border: 2px solid var(--texte-2); background: var(--surface); box-shadow: 0 1px 3px rgba(0, 0, 0, .18);
+  transition: transform .15s ease, background .15s ease;
+}
+.coche-fusion:hover span { transform: scale(1.25); }
+.coche-fusion input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.coche-fusion input:checked + span { background: var(--texte); border-color: var(--texte); box-shadow: 0 0 0 3px var(--accent-doux); }

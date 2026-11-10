@@ -5,13 +5,18 @@
 (function () {
   "use strict";
   const S = window.Site;
-  let META, CLASSIF, ARBRES = null, stat = "medianes", terrActif = null, kArbre = 5;
+  let META, CLASSIF, ARBRES = null, stat = "medianes", terrActif = null, kArbre = 5, sensArbre = "horizontal";
+  let focusArbre = new Set();   // regroupements mis en avant (clés « 1-2 », « 5 »…), gardés tant qu'ils existent
 
   S.chargerTout(["meta", "classifications", "arbres"], ["arbres"]).then(function (d) {
     META = d.meta; CLASSIF = d.classifications;
     ARBRES = d.arbres ? d.arbres.territoires : null;
     document.querySelectorAll("#arbre-k button").forEach(function (b) {
       b.addEventListener("click", function () { kArbre = +b.dataset.k; arbre(CLASSIF[terrActif]); });
+    });
+    // Orientation : classes en lignes (arbre couché à gauche) ou en colonnes (arbre debout au-dessus)
+    document.querySelectorAll("#arbre-sens button").forEach(function (b) {
+      b.addEventListener("click", function () { sensArbre = b.dataset.sens; arbre(CLASSIF[terrActif]); });
     });
 
     // Onglets
@@ -192,14 +197,29 @@
     document.querySelectorAll("#arbre-k button").forEach(function (b) {
       b.setAttribute("aria-pressed", +b.dataset.k === kArbre);
     });
+    document.querySelectorAll("#arbre-sens button").forEach(function (b) {
+      b.setAttribute("aria-pressed", b.dataset.sens === sensArbre);
+    });
+    document.getElementById("arbre-sens-texte").textContent = sensArbre === "vertical" ? "en bas" : "à droite";
 
     // Nœuds : feuilles "1" à "5" (codes de classe), fusions "n1" à "n4" (de la plus basse à la plus haute)
     const noeuds = {}, classes = {};
     c.classes.forEach(function (k) { classes[k.code] = k; noeuds[String(k.code)] = { h: 0, code: k.code }; });
     a.noeuds.forEach(function (n) { noeuds[n.id] = { h: n.hauteur, g: n.gauche, d: n.droite }; });
     const racine = a.noeuds[a.noeuds.length - 1].id;
-    const ordre = [];
-    (function parcourir(id) { const n = noeuds[id]; if (n.g) { parcourir(n.g); parcourir(n.d); } else ordre.push(n.code); })(racine);
+    // Ordre des classes : toujours de « très faible » à « très élevée » (modérée au milieu).
+    // Si l'arbre ne peut pas suivre cet ordre sans retourner ses branches, une branche en croise une autre :
+    // le croisement est dessiné en « pont » (voir trait()) et expliqué sous le graphique.
+    const ordre = c.classes.map(function (k) { return k.code; }).sort(function (x, y) { return x - y; });
+    // Meilleur ordre sans croisement (on retourne les branches d'une fusion pour ranger au mieux) : sert à repérer l'écart
+    const ordreSansCroisement = (function ranger(id) {
+      const n = noeuds[id];
+      if (!n.g) return [n.code];
+      const g = ranger(n.g), d = ranger(n.d);
+      let malRanges = 0;   // paires (g, d) inversées si g passe avant d
+      g.forEach(function (x) { d.forEach(function (y) { if (x > y) malRanges++; }); });
+      return malRanges <= g.length * d.length - malRanges ? g.concat(d) : d.concat(g);
+    })(racine);
 
     // Coupure : entre la (5-K)e et la (5-K+1)e fusion ; groupes = classes reliées sous la coupure
     const hs = a.noeuds.map(function (n) { return n.hauteur; });
@@ -212,64 +232,226 @@
       if (n.g) { marquer(n.g, gg); marquer(n.d, gg); } else groupe[n.code] = gg || id;
     })(racine, null);
 
-    // Arbre en SVG
-    const L = 64, W = 190, M = 12, hMax = hs[hs.length - 1];
-    const x = function (h) { return M + (1 - h / hMax) * (W - 2 * M); };
-    const pos = {};
-    ordre.forEach(function (code, i) { pos[String(code)] = { y: (i + 0.5) * L }; });
-    let traits = "";
-    a.noeuds.forEach(function (n) {
-      const g = pos[n.gauche], d = pos[n.droite], xn = x(n.hauteur);
-      pos[n.id] = { y: (g.y + d.y) / 2 };
-      [[n.gauche, g], [n.droite, d]].forEach(function (e) {
-        // Branche vers une classe restée seule sous la coupure : couleur de la classe
-        const enfant = noeuds[e[0]];
-        const coul = enfant.code && n.hauteur >= hCoupe ? classes[enfant.code].couleur : null;
-        traits += '<path class="branche' + (n.hauteur < hCoupe ? " sous-coupe" : "") + '" d="M' + xn + "," + e[1].y +
-          "H" + x(enfant.h) + '"' + (coul ? ' style="stroke:' + coul + '"' : "") + "/>";
-      });
-      traits += '<path class="branche' + (n.hauteur < hCoupe ? " sous-coupe" : "") + '" d="M' + xn + "," + g.y + "V" + d.y + '"/>';
-      traits += '<circle class="noeud" cx="' + xn + '" cy="' + pos[n.id].y + '" r="3"><title>Fusion à la hauteur ' +
-        S.nombre(n.hauteur, 1) + "</title></circle>";
-    });
-    const xr = x(hMax), yr = pos[racine].y, xc = x(hCoupe);
-    traits = '<path class="branche" d="M' + (xr - 8) + "," + yr + "H" + xr + '"/>' + traits +
-      '<line class="coupure" x1="' + xc + '" y1="2" x2="' + xc + '" y2="' + (5 * L - 2) + '"/>' +
-      '<text class="coupure-texte" x="' + (xc + 4) + '" y="12">coupure</text>';
-    const svg = '<svg class="arbre-svg" width="' + W + '" height="' + 5 * L + '" viewBox="0 0 ' + W + " " + 5 * L +
-      '" role="img" aria-label="Arbre de classification des 5 classes">' + traits + "</svg>";
-
     // Échelle des barres : ±2 ou ±3 écarts-types ; au-delà, la barre est coupée et la valeur affichée
     let maxZ = 0;
     c.classes.forEach(function (k) { META.variables.forEach(function (v) { maxZ = Math.max(maxZ, Math.abs(k.z_scores[v.id])); }); });
     const E = Math.min(3, Math.max(2, Math.ceil(maxZ)));
 
-    let h = '<div class="arbre-entete arbre-col-arbre"></div><div class="arbre-entete">Classe</div>' +
-      META.variables.map(function (v) {
-        return '<div class="arbre-entete arbre-var"><span>' + S.echapper(v.libelle) + "</span>" +
-          '<span class="graduation"><i>−' + E + "</i><i>0</i><i>+" + E + "</i></span></div>";
-      }).join("") +
-      '<div class="arbre-col-arbre" style="grid-row: 2 / span 5">' + svg + "</div>";
-    let precedent = null, parite = 0;
-    ordre.forEach(function (code, i) {
-      const k = classes[code];
-      if (precedent !== null && groupe[code] !== precedent) parite = 1 - parite;
-      const debut = precedent !== null && groupe[code] !== precedent;
-      precedent = groupe[code];
-      const cls = "arbre-cellule groupe-" + parite + (debut ? " debut-groupe" : "");
-      h += '<div class="' + cls + ' arbre-classe" style="grid-row:' + (i + 2) + '"><span class="pastille-couleur" style="background:' +
-        k.couleur + '"></span><span>' + S.echapper(k.niveau) + "<small>" + S.nombre(k.n_iris) + " IRIS</small></span></div>" +
-        META.variables.map(function (v) {
-          const z = k.z_scores[v.id], l = Math.min(Math.abs(z), E) / E * 50, coupe = Math.abs(z) > E;
-          return '<div class="' + cls + '" style="grid-row:' + (i + 2) + '"><div class="axe-z" data-niv="' + code + '" data-var="' + v.id + '">' +
-            '<span class="barre-z' + (coupe ? " coupee" : "") + '" style="background:' + k.couleur + ";" +
-            (z >= 0 ? "left:50%" : "right:50%") + ";width:" + l.toFixed(1) + '%"></span>' +
-            (coupe ? '<span class="valeur-coupee" style="' + (z >= 0 ? "right:0" : "left:0") + '">' + (z > 0 ? "+" : "") +
-              S.nombre(z, 1) + "</span>" : "") + "</div></div>";
-        }).join("");
+    // Classes sous chaque nœud (pour savoir quelles branches appartiennent à un regroupement mis en avant)
+    function feuilles(id) { const n = noeuds[id]; return n.g ? feuilles(n.g).concat(feuilles(n.d)) : [n.code]; }
+    const regroupements = [];
+    ordre.forEach(function (code) {
+      let r = regroupements.find(function (x) { return x.id === groupe[code]; });
+      if (!r) { r = { id: groupe[code], codes: [] }; regroupements.push(r); }
+      r.codes.push(code);
     });
+    regroupements.forEach(function (r) { r.cle = r.codes.slice().sort().join("-"); });
+    const fusions = a.noeuds.slice(0, -1).map(function (n) {
+      const codes = feuilles(n.id);
+      return { id: n.id, codes: codes, cle: codes.slice().sort().join("-") };
+    });
+    const clesValides = new Set(regroupements.concat(fusions).map(function (r) { return r.cle; }));
+    focusArbre = new Set(Array.from(focusArbre).filter(function (k) { return clesValides.has(k); }));
+
+    // Bandes de groupes : alternance à chaque changement de groupe sous la coupure
+    const bandes = {};
+    let precedentG = null, pariteG = 0;
+    ordre.forEach(function (code) {
+      const debut = precedentG !== null && groupe[code] !== precedentG;
+      if (debut) pariteG = 1 - pariteG;
+      precedentG = groupe[code];
+      bandes[code] = { parite: pariteG, debut: debut };
+    });
+    function barre(k, v, vertical) {
+      const z = k.z_scores[v.id], l = Math.min(Math.abs(z), E) / E * 50, coupe = Math.abs(z) > E;
+      const pos = vertical ? (z >= 0 ? "bottom:50%;height:" : "top:50%;height:") : (z >= 0 ? "left:50%;width:" : "right:50%;width:");
+      const val = vertical ? (z >= 0 ? "top:0" : "bottom:0") : (z >= 0 ? "right:0" : "left:0");
+      return '<div class="axe-z' + (vertical ? " axe-z-v" : "") + '" data-niv="' + k.code + '" data-var="' + v.id + '">' +
+        '<span class="barre-z' + (coupe ? " coupee" : "") + (z < 0 ? " negative" : "") + '" style="background:' + k.couleur + ";" +
+        pos + l.toFixed(1) + '%"></span>' +
+        (coupe ? '<span class="valeur-coupee" style="' + val + '">' + (z > 0 ? "+" : "") + S.nombre(z, 1) + "</span>" : "") + "</div>";
+    }
+
+    /* Classes en lignes : arbre couché à gauche (racine à gauche, feuilles à droite) */
+    // Segment droit (x1,y1)-(x2,y2) ; le halo est raccourci aux deux bouts pour ne pas entamer les jonctions
+    function trace(t) { return "M" + t.x1 + "," + t.y1 + "L" + t.x2 + "," + t.y2; }
+    function traits(segments) {
+      return segments.map(function (t) {
+        const lx = t.x2 - t.x1, ly = t.y2 - t.y1, l = Math.hypot(lx, ly), r = 6;
+        if (l <= 2 * r) return "";
+        const ux = lx / l * r, uy = ly / l * r;
+        return '<path class="halo" d="' + trace({ x1: t.x1 + ux, y1: t.y1 + uy, x2: t.x2 - ux, y2: t.y2 - uy }) + '"/>';
+      }).join("") +
+        segments.map(function (t) {
+          return '<path class="branche' + (t.sous ? " sous-coupe" : "") + '" d="' + trace(t) + '" data-codes="' + t.codes.join(" ") + '"' +
+            (t.coul ? ' style="stroke:' + t.coul + '"' : "") + ">" + (t.titre ? "<title>" + t.titre + "</title>" : "") + "</path>";
+        }).join("");
+    }
+
+    // Cases posées sur la ligne de coupure, à l'endroit où elle croise la branche de chaque regroupement
+    // (left / top : position en % de la zone de l'arbre)
+    function coches(position) {
+      return regroupements.map(function (r) {
+        const p = position(r), noms = r.codes.map(function (cd) { return classes[cd].niveau; }).join(" + ");
+        return '<label class="coche-coupure" style="left:' + p.left.toFixed(2) + "%;top:" + p.top.toFixed(2) + '%" title="Mettre en avant : ' +
+          S.echapper(noms) + '"><input type="checkbox" value="' + r.cle + '"' + (focusArbre.has(r.cle) ? " checked" : "") +
+          ' aria-label="Mettre en avant : ' + S.echapper(noms) + '"><span aria-hidden="true"></span></label>';
+      }).join("");
+    }
+
+    // Cases rondes sur les points de fusion : mettent en avant toutes les classes que la fusion réunit
+    function cochesFusions(position) {
+      // Une fusion juste sous la coupure a déjà sa case carrée (mêmes classes) : pas de doublon
+      const clesCoupure = new Set(regroupements.map(function (r) { return r.cle; }));
+      return fusions.filter(function (f) { return !clesCoupure.has(f.cle); }).map(function (f) {
+        const p = position(f), noms = f.codes.slice().sort().map(function (cd) { return classes[cd].niveau; }).join(" + ");
+        return '<label class="coche-fusion" style="left:' + p.left.toFixed(2) + "%;top:" + p.top.toFixed(2) + '%" title="Mettre en avant la fusion : ' +
+          S.echapper(noms) + '"><input type="checkbox" value="' + f.cle + '"' + (focusArbre.has(f.cle) ? " checked" : "") +
+          ' aria-label="Mettre en avant la fusion : ' + S.echapper(noms) + '"><span aria-hidden="true"></span></label>';
+      }).join("");
+    }
+
+    function dessinHorizontal() {
+      const L = 64, W = 260, M = 12, hMax = hs[hs.length - 1];   // 260 px : fusions de hauteurs proches bien séparées
+      const x = function (h) { return M + (1 - h / hMax) * (W - 2 * M); };
+      const pos = {};
+      ordre.forEach(function (code, i) { pos[String(code)] = { y: (i + 0.5) * L }; });
+      let dessin = "";
+      a.noeuds.forEach(function (n) {
+        const g = pos[n.gauche], d = pos[n.droite], xn = x(n.hauteur), sous = n.hauteur < hCoupe;
+        pos[n.id] = { y: (g.y + d.y) / 2 };
+        const segments = [[n.gauche, g], [n.droite, d]].map(function (e) {
+          // Branche vers une classe restée seule sous la coupure : couleur de la classe
+          const enfant = noeuds[e[0]];
+          return { x1: xn, y1: e[1].y, x2: x(enfant.h), y2: e[1].y, sous: sous, codes: feuilles(e[0]),
+                   coul: enfant.code && !sous ? classes[enfant.code].couleur : null };
+        });
+        segments.push({ x1: xn, y1: g.y, x2: xn, y2: d.y, sous: sous, codes: feuilles(n.id) });
+        dessin += traits(segments) + '<circle class="noeud" data-codes="' + feuilles(n.id).join(" ") + '" cx="' + xn + '" cy="' + pos[n.id].y + '" r="3"><title>Fusion à la hauteur ' +
+          S.nombre(n.hauteur, 1) + "</title></circle>";
+      });
+      const xr = x(hMax), yr = pos[racine].y, xc = x(hCoupe);
+      // Cases trop proches (branches voisines, croisement) : la case de la branche la plus longue glisse vers la droite,
+      // en restant sur sa branche
+      const posCoches = regroupements.map(function (r) {
+        return { cle: r.cle, x: xc, y: pos[String(r.id)].y, xFin: x(noeuds[String(r.id)].h) };
+      }).sort(function (p, q) { return p.y - q.y; });
+      for (let i = 1; i < posCoches.length; i++) {
+        const p = posCoches[i - 1], q = posCoches[i];
+        if (q.y - p.y < 20) { const m = q.xFin > p.xFin ? q : p; m.x = Math.min(xc + 22, m.xFin - 6); }
+      }
+      const xCoche = {};
+      posCoches.forEach(function (p) { xCoche[p.cle] = p.x; });
+      dessin = '<path class="branche" d="M' + (xr - 8) + "," + yr + "H" + xr + '"/>' + dessin +
+        '<line class="coupure" x1="' + xc + '" y1="2" x2="' + xc + '" y2="' + (5 * L - 2) + '"/>' +
+        '<text class="coupure-texte" x="' + (xc + 4) + '" y="12">coupure</text>';
+      const svg = '<svg class="arbre-svg" width="' + W + '" height="' + 5 * L + '" viewBox="0 0 ' + W + " " + 5 * L +
+        '" role="img" aria-label="Arbre de classification des 5 classes">' + dessin + "</svg>";
+
+      let h = '<div class="arbre-entete arbre-col-arbre"></div><div class="arbre-entete">Classe</div>' +
+        META.variables.map(function (v) {
+          return '<div class="arbre-entete arbre-var"><span>' + S.echapper(v.libelle) + "</span>" +
+            '<span class="graduation"><i>−' + E + "</i><i>0</i><i>+" + E + "</i></span></div>";
+        }).join("") +
+        '<div class="arbre-col-arbre" style="grid-row: 2 / span 5"><div class="arbre-zone" style="width:' + W + "px;height:" + 5 * L + 'px">' +
+        svg + coches(function (r) { return { left: xCoche[r.cle] / W * 100, top: pos[String(r.id)].y / (5 * L) * 100 }; }) +
+        cochesFusions(function (f) { return { left: x(noeuds[f.id].h) / W * 100, top: pos[f.id].y / (5 * L) * 100 }; }) + "</div></div>";
+      ordre.forEach(function (code, i) {
+        const k = classes[code];
+        const cls = "arbre-cellule groupe-" + bandes[code].parite + (bandes[code].debut ? " debut-groupe" : "");
+        h += '<div class="' + cls + ' arbre-classe" data-code="' + code + '" style="grid-row:' + (i + 2) + '"><span class="pastille-couleur" style="background:' +
+          k.couleur + '"></span><span>' + S.echapper(k.niveau) + "<small>" + S.nombre(k.n_iris) + " IRIS</small></span></div>" +
+          META.variables.map(function (v) {
+            return '<div class="' + cls + '" data-code="' + code + '" style="grid-row:' + (i + 2) + '">' + barre(k, v, false) + "</div>";
+          }).join("");
+      });
+      return h;
+    }
+
+    /* Classes en colonnes : arbre debout au-dessus (racine en haut, feuilles en bas), barres verticales */
+    function dessinVertical() {
+      const W = 500, H = 180, M = 12, hMax = hs[hs.length - 1], pas = W / 5;
+      const y = function (hh) { return M + (1 - hh / hMax) * (H - 2 * M); };
+      const pos = {};
+      ordre.forEach(function (code, i) { pos[String(code)] = { x: (i + 0.5) * pas }; });
+      let dessin = "";
+      a.noeuds.forEach(function (n) {
+        const g = pos[n.gauche], d = pos[n.droite], yn = y(n.hauteur), sous = n.hauteur < hCoupe;
+        pos[n.id] = { x: (g.x + d.x) / 2 };
+        const titre = "Fusion à la hauteur " + S.nombre(n.hauteur, 1);
+        const segments = [[n.gauche, g], [n.droite, d]].map(function (e) {
+          const enfant = noeuds[e[0]];
+          return { x1: e[1].x, y1: yn, x2: e[1].x, y2: y(enfant.h), sous: sous, titre: titre, codes: feuilles(e[0]),
+                   coul: enfant.code && !sous ? classes[enfant.code].couleur : null };
+        });
+        segments.push({ x1: g.x, y1: yn, x2: d.x, y2: yn, sous: sous, codes: feuilles(n.id) });
+        dessin += traits(segments);
+      });
+      const yc = y(hCoupe);
+      dessin = '<path class="branche" d="M' + pos[racine].x + "," + (y(hMax) - 8) + "V" + y(hMax) + '"/>' + dessin +
+        '<line class="coupure" x1="2" y1="' + yc + '" x2="' + (W - 2) + '" y2="' + yc + '"/>';
+      // SVG étiré sur la largeur des colonnes (traits d'épaisseur constante) ; « coupure » en HTML pour ne pas être déformé
+      let h = '<div class="arbre-v-arbre"><svg class="arbre-svg" viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="none" ' +
+        'role="img" aria-label="Arbre de classification des 5 classes">' + dessin + "</svg>" +
+        '<span class="coupure-etiquette" style="top:' + (yc / H * 100).toFixed(1) + '%">coupure</span>' +
+        coches(function (r) { return { left: pos[String(r.id)].x / W * 100, top: yc / H * 100 }; }) +
+        cochesFusions(function (f) { return { left: pos[f.id].x / W * 100, top: y(noeuds[f.id].h) / H * 100 }; }) + "</div>";
+      h += '<div class="arbre-entete arbre-v-coin">Classe</div>';
+      ordre.forEach(function (code, i) {
+        const k = classes[code], bd = bandes[code];
+        h += '<div class="arbre-cellule arbre-classe arbre-classe-v groupe-' + bd.parite + (bd.debut ? " debut-groupe-v" : "") +
+          '" data-code="' + code + '" style="grid-column:' + (i + 2) + '"><span class="pastille-couleur" style="background:' + k.couleur + '"></span>' +
+          "<span>" + S.echapper(k.niveau) + "<small>" + S.nombre(k.n_iris) + " IRIS</small></span></div>";
+      });
+      META.variables.forEach(function (v, r) {
+        h += '<div class="arbre-entete arbre-var-v" style="grid-row:' + (r + 3) + '"><span>' + S.echapper(v.libelle) + "</span>" +
+          '<span class="graduation-v"><i>+' + E + "</i><i>0</i><i>−" + E + "</i></span></div>";
+        ordre.forEach(function (code, i) {
+          const bd = bandes[code];
+          h += '<div class="arbre-cellule groupe-' + bd.parite + (bd.debut ? " debut-groupe-v" : "") + '" data-code="' + code + '" style="grid-row:' + (r + 3) +
+            ";grid-column:" + (i + 2) + '">' + barre(classes[code], v, true) + "</div>";
+        });
+      });
+      return h;
+    }
+
+    const h = sensArbre === "vertical" ? dessinVertical() : dessinHorizontal();
     const grille = document.getElementById("arbre-grille");
+    grille.classList.toggle("vertical", sensArbre === "vertical");
     grille.innerHTML = h;
+
+    // « Mettre en avant » : cases sur la ligne de coupure (une par regroupement) ; les classes non cochées s'estompent
+    const zoneFocus = document.getElementById("arbre-focus");
+    zoneFocus.innerHTML = '<span class="arbre-etiquette">Cochez une branche sur la coupure (carré) ou une fusion (rond) pour la mettre en avant.</span>' +
+      '<button type="button" class="tout-afficher"' + (focusArbre.size ? "" : " hidden") + ">Tout réafficher</button>";
+    function appliquerFocus() {
+      const actifs = new Set();
+      focusArbre.forEach(function (cle) { cle.split("-").forEach(function (cd) { actifs.add(cd); }); });
+      const filtre = actifs.size > 0;
+      grille.classList.toggle("avec-focus", filtre);
+      grille.querySelectorAll("[data-code]").forEach(function (el) {
+        el.classList.toggle("estompe", filtre && !actifs.has(el.dataset.code));
+      });
+      grille.querySelectorAll("[data-codes]").forEach(function (el) {
+        el.classList.toggle("estompe", filtre && !el.dataset.codes.split(" ").some(function (cd) { return actifs.has(cd); }));
+      });
+      zoneFocus.querySelector(".tout-afficher").hidden = !filtre;
+    }
+    const cases = grille.querySelectorAll(".coche-coupure input, .coche-fusion input");
+    cases.forEach(function (cb) {
+      cb.addEventListener("change", function () {
+        if (cb.checked) focusArbre.add(cb.value); else focusArbre.delete(cb.value);
+        // Même regroupement coché ailleurs (case de coupure et case de fusion identiques) : on synchronise
+        cases.forEach(function (autre) { if (autre.value === cb.value) autre.checked = cb.checked; });
+        appliquerFocus();
+      });
+    });
+    zoneFocus.querySelector(".tout-afficher").addEventListener("click", function () {
+      focusArbre.clear();
+      cases.forEach(function (cb) { cb.checked = false; });
+      appliquerFocus();
+    });
+    appliquerFocus();
     grille.querySelectorAll(".axe-z").forEach(function (el) {
       S.infobulle(el, function () {
         const k = classes[el.dataset.niv], v = el.dataset.var, z = k.z_scores[v];
@@ -282,6 +464,22 @@
     document.getElementById("arbre-variance").innerHTML =
       '<strong>' + pct(kArbre) + "</strong><span>de la variance expliquée avec " + kArbre + " classes</span>" +
       '<span class="jauge"><i style="width:' + a.part_variance_pct[kArbre] + '%"></i></span>';
+    // Croisement de branches (ordre strict impossible sans croiser) : on dit pourquoi
+    const inversions = [];
+    for (let i = 0; i + 1 < ordreSansCroisement.length; i++) {
+      if (ordreSansCroisement[i] > ordreSansCroisement[i + 1]) {
+        inversions.push([classes[ordreSansCroisement[i]], classes[ordreSansCroisement[i + 1]]]);
+      }
+    }
+    const noteOrdre = document.getElementById("arbre-ordre");
+    noteOrdre.hidden = !inversions.length;
+    noteOrdre.innerHTML = inversions.map(function (p) {
+      return "Pour garder les classes de « très faible » à « très élevée », la branche de <b>" + S.echapper(p[1].niveau) +
+        "</b> passe par-dessus celle de <b>" + S.echapper(p[0].niveau) + "</b> (croisement dessiné en pont) : ici, la classe " +
+        S.echapper(p[0].niveau.toLowerCase()) + " rejoint les classes plus favorisées avant la classe " +
+        S.echapper(p[1].niveau.toLowerCase()) + ".";
+    }).join(" ");
+
     document.getElementById("arbre-lecture").innerHTML = (LECTURES_ARBRE[c.id] ? "<ul>" + LECTURES_ARBRE[c.id].map(function (t) {
       return "<li>" + t.replace("{k2}", pct(2)).replace("{k5}", pct(5)) + "</li>";
     }).join("") + "</ul>" : "");
