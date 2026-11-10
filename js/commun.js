@@ -236,20 +236,65 @@
     }).catch(function () { /* bandeau déjà affiché */ });
   });
 
-  /* Pages claires : les blocs apparaissent en fondu quand on les fait défiler.
-     La classe n'est posée que par le script : sans JavaScript, tout reste visible. */
+  /* ---------- Mode sombre (pages Accueil et Classification ; la Carte est déjà sombre) ----------
+     Disque à moitié plein : il fait un demi-tour à chaque changement. */
+  function boutonTheme() {
+    const nav = document.querySelector(".nav");
+    if (!nav || !document.body.classList.contains("theme-clair")) return;
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "bouton-theme";
+    b.innerHTML = '<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" ' +
+      'fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 1.75a8.25 8.25 0 0 1 0 16.5z" fill="currentColor"/></svg>';
+    function maj() {
+      const sombre = document.documentElement.getAttribute("data-theme") === "sombre";
+      const texte = sombre ? "Passer en mode clair" : "Passer en mode sombre";
+      b.setAttribute("aria-pressed", sombre); b.setAttribute("aria-label", texte); b.title = texte;
+    }
+    b.addEventListener("click", function () {
+      const t = document.documentElement.getAttribute("data-theme") === "sombre" ? "clair" : "sombre";
+      document.documentElement.setAttribute("data-theme", t);
+      try { localStorage.setItem("theme", t); } catch (e) { /* navigation privée : choix non mémorisé */ }
+      maj();
+      document.dispatchEvent(new CustomEvent("theme:change", { detail: t }));
+    });
+    maj();
+    nav.appendChild(b);
+  }
+
+  /* ---------- Bandeau cookies : information honnête, un seul bouton ----------
+     Le site ne dépose aucun cookie de suivi ; il garde seulement des préférences dans le navigateur. */
+  function bandeauCookies() {
+    try { if (localStorage.getItem("bandeau-cookies") === "vu") return; } catch (e) { /* on l'affiche */ }
+    const aside = document.createElement("aside");
+    aside.className = "bandeau-cookies";
+    aside.setAttribute("aria-label", "Cookies");
+    aside.innerHTML = "<p><strong>Pas de cookie de suivi.</strong> Ce site ne mesure pas votre visite et n'affiche aucune " +
+      "publicité. Votre navigateur garde seulement vos préférences d'affichage (thème, ce message). " +
+      "Les polices de caractères sont chargées depuis Google Fonts.</p>" +
+      '<button type="button" class="bouton">Compris</button>';
+    aside.querySelector("button").addEventListener("click", function () {
+      try { localStorage.setItem("bandeau-cookies", "vu"); } catch (e) { /* fermé pour cette page seulement */ }
+      aside.remove();
+    });
+    document.body.appendChild(aside);
+  }
+
+  /* Flèches des liens (« Voir la carte → ») : isolées pour avancer au survol */
+  function flechesLiens(racine) {
+    (racine || document).querySelectorAll("a").forEach(function (a) {
+      const t = a.lastChild;
+      if (!t || t.nodeType !== 3 || !/→\s*$/.test(t.nodeValue) || a.querySelector(".fleche")) return;
+      t.nodeValue = t.nodeValue.replace(/\s*→\s*$/, " ");
+      const f = document.createElement("span");
+      f.className = "fleche"; f.setAttribute("aria-hidden", "true"); f.textContent = "→";
+      a.appendChild(f);
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
-    // L'accueil a ses propres animations (GSAP, accueil-anim.js)
-    if (document.documentElement.classList.contains("anim-gsap")) return;
-    if (!document.body.classList.contains("theme-clair") || !("IntersectionObserver" in window) ||
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const cibles = document.querySelectorAll("section.bloc > .conteneur > *, .enjeu-texte, .bandeau-chiffres dl");
-    const obs = new IntersectionObserver(function (entrees) {
-      entrees.forEach(function (e) {
-        if (e.isIntersecting) { e.target.classList.add("visible"); obs.unobserve(e.target); }
-      });
-    }, { rootMargin: "0px 0px -8% 0px" });
-    cibles.forEach(function (el) { el.classList.add("reveler"); obs.observe(el); });
+    boutonTheme();
+    bandeauCookies();
+    flechesLiens();
   });
 
   window.Site = {
@@ -258,6 +303,6 @@
     niveauxParCode: niveauxParCode, badge: badge,
     echapper: echapper, normaliser: normaliser, parametre: parametre,
     infobulle: infobulle, barreRepartition: barreRepartition, legendeNiveaux: legendeNiveaux,
-    recherche: recherche, afficherErreur: afficherErreur
+    recherche: recherche, afficherErreur: afficherErreur, flechesLiens: flechesLiens
   };
 })();

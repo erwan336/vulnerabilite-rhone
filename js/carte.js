@@ -84,6 +84,8 @@
 
   S.chargerTout(["meta", "classifications", "iris", "irisGeo", "limites", "qpv", "qpv2024", "actions"],
                 ["qpv", "qpv2024", "actions"]).then(function (d) {
+    const ecran = document.getElementById("chargement-carte");
+    if (ecran) ecran.remove();
     DONNEES = d;
     META = d.meta; NIV = S.niveauxParCode(META); CLASSIF = d.classifications;
     META.niveaux.forEach(function (n) { visibles[n.code] = true; });
@@ -190,7 +192,10 @@
     document.getElementById("bouton-panneau").addEventListener("click", function () {
       basculerPanneau(!document.getElementById("panneau").classList.contains("ouvert"));
     });
-  }).catch(function () {});
+  }).catch(function () {
+    const ecran = document.getElementById("chargement-carte");   // le bandeau d'erreur prend le relais
+    if (ecran) ecran.remove();
+  });
 
   /* ---------- Actions de prévention 2022-2024 (data/actions.geojson) ----------
      Sémiologie propre aux actions (distincte des aplats d'IRIS et des contours QPV/limites) :

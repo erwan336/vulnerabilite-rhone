@@ -2,7 +2,7 @@
    accueil-anim.js - animations de la page d'accueil (GSAP 3.13 + ScrollTrigger + SplitText, lib/gsap)
    - héros : titre qui monte ligne par ligne, texte et carte en cascade, photo en léger parallaxe
    - mini-carte : les IRIS apparaissent en onde depuis Lyon
-   - chiffres clés : compteur ; sections : titres et cartes qui entrent au défilement
+   - chiffres clés : compteur ; barres des territoires qui se déploient (pas de fondu générique au défilement)
    Le <head> pose la classe "anim-gsap" (sauf si l'utilisateur limite les animations) ;
    sans GSAP ou en cas d'erreur, on la retire et la page s'affiche normalement.
    ============================================================================= */
@@ -49,30 +49,11 @@
     // En-tête : ombre légère dès que la page défile
     ScrollTrigger.create({ start: 8, end: "max", toggleClass: { targets: ".entete", className: "defile" } });
 
-    // Titres de section : lignes qui montent derrière un masque, puis le reste de l'en-tête
-    document.querySelectorAll("section.bloc > .conteneur > header, .enjeu-texte").forEach(function (entete) {
-      const h2 = entete.querySelector("h2");
-      const declencheur = { trigger: entete, start: "top 82%", once: true };
-      if (h2) SplitText.create(h2, {
-        type: "lines", mask: "lines", autoSplit: true,
-        onSplit: function (self) {
-          return gsap.from(self.lines, { yPercent: 105, duration: .9, stagger: .08, ease: "power3.out", scrollTrigger: declencheur });
-        }
-      });
-      const autres = Array.prototype.filter.call(entete.querySelectorAll(".surtitre, p, a, header > div > *"),
-        function (el) { return el !== h2 && !el.contains(h2); });
-      if (autres.length) gsap.from(autres, { y: 18, autoAlpha: 0, duration: .7, stagger: .08, ease: "power3.out",
-        delay: h2 ? .35 : 0, scrollTrigger: declencheur });
-    });
   }
 
   /* ---------- Contenu chargé : chiffres, cartes, étapes ---------- */
   function contenu() {
     // Chiffres clés : cascade + compteur de 0 à la valeur ("1,9 M", "752"…)
-    gsap.from("#chiffres > div", {
-      y: 24, autoAlpha: 0, duration: .7, stagger: .1, ease: "power3.out",
-      scrollTrigger: { trigger: "#chiffres", start: "top 88%", once: true }
-    });
     document.querySelectorAll("#chiffres dt").forEach(function (el) {
       const final = el.textContent;
       const m = final.match(/^([\d\s  ]*\d(?:,\d+)?)(.*)$/);
@@ -89,27 +70,11 @@
       });
     });
 
-    // Cartes et étapes : entrent par petits groupes quand elles arrivent à l'écran
-    const cartes = gsap.utils.toArray("#territoires > .carte-info, #indicateurs > .indicateur, #etapes > li");
-    gsap.set(cartes, { autoAlpha: 0, y: 40 });
-    ScrollTrigger.batch(cartes, {
-      start: "top 90%", once: true,
-      onEnter: function (lot) {
-        gsap.to(lot, { autoAlpha: 1, y: 0, duration: .8, stagger: .1, ease: "power3.out", overwrite: true,
-          clearProps: "transform" });   // rend la main aux effets de survol (CSS)
-        // Barres de répartition des territoires : les segments se déploient de gauche à droite
-        lot.forEach(function (carte) {
-          const segments = carte.querySelectorAll(".repartition > span");
-          if (segments.length) gsap.from(segments, { scaleX: 0, transformOrigin: "left center", duration: .7,
-            stagger: .07, ease: "power2.out", delay: .25 });
-        });
-      }
-    });
-
-    // Avertissement et liens de fin de section
-    gsap.utils.toArray("section.bloc > .conteneur > p").forEach(function (p) {
-      gsap.from(p, { y: 16, autoAlpha: 0, duration: .7, ease: "power3.out",
-        scrollTrigger: { trigger: p, start: "top 92%", once: true } });
+    // Barres de répartition des territoires : les segments se déploient quand la carte arrive à l'écran
+    // (animation des données elles-mêmes ; les blocs, eux, ne font pas de fondu au défilement)
+    gsap.utils.toArray("#territoires .repartition").forEach(function (barre) {
+      gsap.from(barre.children, { scaleX: 0, transformOrigin: "left center", duration: .7, stagger: .07, ease: "power2.out",
+        scrollTrigger: { trigger: barre, start: "top 90%", once: true } });
     });
     ScrollTrigger.refresh();
   }

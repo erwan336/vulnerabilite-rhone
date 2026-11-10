@@ -16,7 +16,7 @@
   };
   const LIBELLES_ECHELLES = { departement: "départementale", metropole: "de la Métropole de Lyon",
                               hors_metropole: "du Rhône hors Métropole" };
-  const FANTOME = "#ECE7DD", DUREE_ECHELLE = 3000;   // 3 s par échelle
+  const DUREE_ECHELLE = 3000;   // 3 s par échelle
 
   function carrousel(meta) {
     const figure = document.getElementById("carrousel-echelles");
@@ -48,9 +48,11 @@
       if (w / h > .75) h = w / .75; else w = h * .75;
       return [(x0 + x1 - w) / 2, (y0 + y1 - h) / 2, w, h].map(function (v) { return v.toFixed(1); }).join(" ");
     }
+    // IRIS hors de l'échelle : teinte « fantôme » du thème (clair ou sombre, variable CSS --fantome)
+    let fantome = "";
     function couleur(p, t) {
       const v = p.getAttribute("data-" + t);
-      return v === "" ? FANTOME : (niv[v] || niv[0]).couleur;
+      return v === "" ? fantome : (niv[v] || niv[0]).couleur;
     }
 
     // Onglets avec barre de progression
@@ -66,6 +68,7 @@
     function afficher(i) {
       actif = i; ecoule = 0;
       const t = terrs[i];
+      fantome = getComputedStyle(document.body).getPropertyValue("--fantome").trim() || "#ECE7DD";
       boutons.forEach(function (b, j) {
         b.setAttribute("aria-selected", j === i); b.tabIndex = j === i ? 0 : -1;
         b.querySelector(".progression").style.transform = "scaleX(0)";
@@ -112,6 +115,7 @@
     if ("IntersectionObserver" in window) {
       new IntersectionObserver(function (e) { visible = e[0].isIntersecting; }).observe(figure);
     }
+    document.addEventListener("theme:change", function () { afficher(actif); });   // recolore les fantômes
     afficher(0);
     if (!auto) return;
     (function boucle(t) {

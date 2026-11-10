@@ -8,7 +8,7 @@
 .heros {
   padding: 72px 0 64px;
   background:
-    linear-gradient(90deg, rgba(246, 244, 239, .97) 0%, rgba(246, 244, 239, .93) 44%, rgba(246, 244, 239, .6) 58%, rgba(246, 244, 239, 0) 74%),
+    linear-gradient(90deg, rgba(var(--voile), .97) 0%, rgba(var(--voile), .93) 44%, rgba(var(--voile), .6) 58%, rgba(var(--voile), 0) 74%),
     url("../image/fond_heros_lyon.jpg") 70% 60% / cover no-repeat;
 }
 .heros-grille { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: clamp(40px, 5vw, 88px); align-items: center; }
@@ -26,14 +26,14 @@
 /* Carte du département */
 .heros-carte {
   margin: 0; padding: 20px 22px 16px; border-radius: var(--rayon);
-  background: rgba(255, 255, 255, .92); box-shadow: 0 12px 32px rgba(15, 25, 45, .25);
+  background: var(--carte-heros); box-shadow: 0 12px 32px rgba(15, 25, 45, .25);
 }
 .mini-carte { display: block; }
 .mini-carte svg { display: block; width: 100%; height: auto; max-height: 520px; }
-.mini-carte path { stroke: #fff; stroke-width: .5; vector-effect: non-scaling-stroke; }   /* trait fin même zoomé */
+.mini-carte path { stroke: var(--surface); stroke-width: .5; vector-effect: non-scaling-stroke; }   /* trait fin même zoomé */
 .mini-carte:hover path { opacity: .9; }
 .mini-carte path:hover { opacity: 1; stroke: var(--texte); stroke-width: 1; }
-.mini-carte:empty { min-height: 380px; background: var(--surface-2); border-radius: var(--rayon); }
+.mini-carte .chargement { min-height: 380px; background: var(--surface-2); border-radius: var(--rayon); }
 .heros-carte figcaption { margin-top: 14px; font-size: .85rem; color: var(--texte-3); display: grid; gap: 8px; }
 .heros-carte .legende-niveaux { color: var(--texte-2); }
 
@@ -50,7 +50,7 @@
   padding: 80px 0;
   background:
     /* fondu calé sur le bord gauche de l'image (collée à droite), quelle que soit la largeur d'écran */
-    linear-gradient(90deg, var(--fond) calc(100% - 560px), rgba(246, 244, 239, 0) calc(100% - 300px)),
+    linear-gradient(90deg, var(--fond) calc(100% - 560px), rgba(var(--voile), 0) calc(100% - 300px)),
     url("../image/fond_panneau_sante.jpg") right center / 560px auto no-repeat,
     var(--fond);
   border-bottom: 1px solid var(--bordure);
@@ -102,7 +102,7 @@
   /* Texte au-dessus, image en dessous : voile clair plus haut et photo en bas */
   .heros {
     background:
-      linear-gradient(180deg, rgba(246, 244, 239, .96) 0%, rgba(246, 244, 239, .9) 45%, rgba(246, 244, 239, .2) 75%),
+      linear-gradient(180deg, rgba(var(--voile), .96) 0%, rgba(var(--voile), .9) 45%, rgba(var(--voile), .2) 75%),
       url("../image/fond_heros_lyon.jpg") 70% 100% / cover no-repeat;
   }
 }
@@ -110,9 +110,9 @@
   .bandeau-enjeu {
     padding: 56px 0 260px;
     background:
-      linear-gradient(180deg, var(--fond) 0%, var(--fond) 50%, rgba(246, 244, 239, 0) 72%),
-      linear-gradient(90deg, var(--fond) calc(50% - 170px), rgba(246, 244, 239, 0) calc(50% - 60px),
-                             rgba(246, 244, 239, 0) calc(50% + 60px), var(--fond) calc(50% + 170px)),
+      linear-gradient(180deg, var(--fond) 0%, var(--fond) 50%, rgba(var(--voile), 0) 72%),
+      linear-gradient(90deg, var(--fond) calc(50% - 170px), rgba(var(--voile), 0) calc(50% - 60px),
+                             rgba(var(--voile), 0) calc(50% + 60px), var(--fond) calc(50% + 170px)),
       url("../image/fond_panneau_sante.jpg") center bottom / 320px auto no-repeat,
       var(--fond);
   }
@@ -211,5 +211,3 @@
 .echelle-texte span { color: var(--texte-2); font-size: .86rem; line-height: 1.45; }
 .echelle-texte .echelle-chiffres { color: var(--texte-3); font-size: .78rem; font-variant-numeric: tabular-nums; }
 @media (max-width: 420px) { .echelles button { padding: 8px 6px; font-size: .74rem; } }
-/* Verre dépoli derrière la carte : la photo reste suggérée sans brouiller les IRIS « fantômes » */
-.heros-carte { -webkit-backdrop-filter: blur(10px) saturate(1.1); backdrop-filter: blur(10px) saturate(1.1); }
